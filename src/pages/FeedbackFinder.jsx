@@ -60,29 +60,29 @@ const FeedbackFinder = () => {
 
       const doc = new jsPDF()
 
-    // Company Header
+    // Company Header (only company name on top)
     doc.setFontSize(14)
     doc.setTextColor(30, 64, 175)
-    doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, 10, { align: 'center' })
+    doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, 12, { align: 'center' })
 
-    // Line separator
+    // Line separator (moved closer)
     doc.setDrawColor(200, 200, 200)
-    doc.line(20, 24, 190, 24)
+    doc.line(20, 20, 190, 20)
 
-    // Header
+    // Header (moved up to reduce gap)
     doc.setFontSize(18)
     doc.setTextColor(30, 64, 175)
-    doc.text('Train Feedback Report', 105, 35, { align: 'center' })
+    doc.text('Train Feedback Report', 105, 28, { align: 'center' })
 
     doc.setFontSize(12)
     doc.setTextColor(0, 0, 0)
-    doc.text(`Train No: ${trainNo}`, 105, 45, { align: 'center' })
-    doc.text(`Date: ${new Date(date).toLocaleDateString()}`, 105, 52, { align: 'center' })
-    doc.text(`Total Feedbacks: ${feedbacks.length}`, 105, 59, { align: 'center' })
+    doc.text(`Train No: ${trainNo}`, 105, 34, { align: 'center' })
+    doc.text(`Date: ${new Date(date).toLocaleDateString()}`, 105, 40, { align: 'center' })
+    doc.text(`Total Feedbacks: ${feedbacks.length}`, 105, 46, { align: 'center' })
 
-    // Line separator
+    // Line separator (below header)
     doc.setDrawColor(200, 200, 200)
-    doc.line(20, 63, 190, 63)
+    doc.line(20, 52, 190, 52)
 
     // Table data
     const tableData = feedbacks.map(fb => [
@@ -96,7 +96,7 @@ const FeedbackFinder = () => {
     ])
 
     doc.autoTable({
-      startY: 67,
+      startY: 60,
       head: [['#', 'Train', 'Route', 'Coach', 'PSI', 'Rating', 'Date']],
       body: tableData,
       theme: 'striped',
@@ -155,30 +155,30 @@ const FeedbackFinder = () => {
     try {
       const doc = new jsPDF()
 
-    // Company Header
+    // Company Header (only company name on top)
     doc.setFontSize(14)
     doc.setTextColor(30, 64, 175)
-    doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, 10, { align: 'center' })
+    doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, 12, { align: 'center' })
 
-    // Line separator
+    // Line separator (moved closer)
     doc.setDrawColor(200, 200, 200)
-    doc.line(20, 24, 190, 24)
+    doc.line(20, 20, 190, 20)
 
-    // Header
+    // Header (moved up to reduce gap)
     doc.setFontSize(20)
     doc.setTextColor(30, 64, 175)
-    doc.text('Feedback Details', 105, 35, { align: 'center' })
+    doc.text('Feedback Details', 105, 28, { align: 'center' })
 
     // Feedback Number
     doc.setFontSize(14)
     doc.setTextColor(0, 0, 0)
-    doc.text(`Feedback #${feedback.feedbackNo}`, 105, 50, { align: 'center' })
+    doc.text(`Feedback #${feedback.feedbackNo}`, 105, 40, { align: 'center' })
 
-    // Line separator
+    // Line separator (below header)
     doc.setDrawColor(200, 200, 200)
-    doc.line(20, 57, 190, 57)
+    doc.line(20, 46, 190, 46)
 
-    let yPos = 65
+    let yPos = 54
 
     // Train Information
     doc.setFontSize(12)

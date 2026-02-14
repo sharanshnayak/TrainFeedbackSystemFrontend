@@ -77,13 +77,6 @@ const Login = () => {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <p className="text-xs md:text-sm text-gray-600 text-center">
-            <strong>Demo Credentials:</strong><br />
-            User ID: admin | Password: admin123
-          </p>
-        </div>
       </div>
     </div>
   )
