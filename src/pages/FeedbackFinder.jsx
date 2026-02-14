@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'react-toastify'
-import axios from 'axios'
-import jsPDF from 'jspdf'
+import api from '../services/api'
+import { jsPDF } from 'jspdf'
 import 'jspdf-autotable'
 
 const FeedbackFinder = () => {
@@ -23,7 +23,7 @@ const FeedbackFinder = () => {
     setSearched(true)
 
     try {
-      const response = await axios.get('/api/feedback/search', {
+      const response = await api.get('/feedback/search', {
         params: { trainNo, date }
       })
 
@@ -52,27 +52,37 @@ const FeedbackFinder = () => {
   }
 
   const exportToPDF = () => {
-    if (feedbacks.length === 0) {
-      toast.error('No feedbacks to export')
-      return
-    }
+    try {
+      if (feedbacks.length === 0) {
+        toast.error('No feedbacks to export')
+        return
+      }
 
-    const doc = new jsPDF()
+      const doc = new jsPDF()
+
+    // Company Header
+    doc.setFontSize(14)
+    doc.setTextColor(30, 64, 175)
+    doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, 10, { align: 'center' })
+
+    // Line separator
+    doc.setDrawColor(200, 200, 200)
+    doc.line(20, 24, 190, 24)
 
     // Header
     doc.setFontSize(18)
     doc.setTextColor(30, 64, 175)
-    doc.text('Train Feedback Report', 105, 20, { align: 'center' })
+    doc.text('Train Feedback Report', 105, 35, { align: 'center' })
 
     doc.setFontSize(12)
     doc.setTextColor(0, 0, 0)
-    doc.text(`Train No: ${trainNo}`, 105, 30, { align: 'center' })
-    doc.text(`Date: ${new Date(date).toLocaleDateString()}`, 105, 37, { align: 'center' })
-    doc.text(`Total Feedbacks: ${feedbacks.length}`, 105, 44, { align: 'center' })
+    doc.text(`Train No: ${trainNo}`, 105, 45, { align: 'center' })
+    doc.text(`Date: ${new Date(date).toLocaleDateString()}`, 105, 52, { align: 'center' })
+    doc.text(`Total Feedbacks: ${feedbacks.length}`, 105, 59, { align: 'center' })
 
     // Line separator
     doc.setDrawColor(200, 200, 200)
-    doc.line(20, 48, 190, 48)
+    doc.line(20, 63, 190, 63)
 
     // Table data
     const tableData = feedbacks.map(fb => [
@@ -86,7 +96,7 @@ const FeedbackFinder = () => {
     ])
 
     doc.autoTable({
-      startY: 52,
+      startY: 67,
       head: [['#', 'Train', 'Route', 'Coach', 'PSI', 'Rating', 'Date']],
       body: tableData,
       theme: 'striped',
@@ -100,13 +110,13 @@ const FeedbackFinder = () => {
         cellPadding: 2
       },
       columnStyles: {
-        0: { cellWidth: 15 },
-        1: { cellWidth: 35 },
-        2: { cellWidth: 40 },
-        3: { cellWidth: 20 },
-        4: { cellWidth: 20 },
-        5: { cellWidth: 20 },
-        6: { cellWidth: 25 }
+        0: { cellWidth: 12 },
+        1: { cellWidth: 30 },
+        2: { cellWidth: 35 },
+        3: { cellWidth: 18 },
+        4: { cellWidth: 15 },
+        5: { cellWidth: 18 },
+        6: { cellWidth: 23 }
       }
     })
 
@@ -114,38 +124,61 @@ const FeedbackFinder = () => {
     const pageCount = doc.internal.getNumberOfPages()
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i)
+      
+      // Company info footer
       doc.setFontSize(8)
+      doc.setTextColor(100, 100, 100)
+      doc.line(20, doc.internal.pageSize.height - 20, 190, doc.internal.pageSize.height - 20)
+      doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, doc.internal.pageSize.height - 16, { align: 'center' })
+      doc.text('Regd. Off: 14/1, Nirode Behari Mullick Road, Kolkata - 700 006', 105, doc.internal.pageSize.height - 12, { align: 'center' })
+      doc.text('Phone: 033-6535 8154 | E-mail: ybcolcs@yahoo.in', 105, doc.internal.pageSize.height - 8, { align: 'center' })
+      
+      // Page number
       doc.setTextColor(150, 150, 150)
       doc.text(
         `Page ${i} of ${pageCount}`,
         105,
-        doc.internal.pageSize.height - 10,
+        doc.internal.pageSize.height - 4,
         { align: 'center' }
       )
     }
 
     doc.save(`feedbacks_${trainNo}_${new Date(date).toISOString().split('T')[0]}.pdf`)
     toast.success('PDF exported successfully!')
+    } catch (error) {
+      console.error('Error exporting PDF:', error)
+      toast.error('Error exporting PDF: ' + error.message)
+    }
   }
 
   const exportSingleFeedbackPDF = (feedback) => {
-    const doc = new jsPDF()
+    try {
+      const doc = new jsPDF()
+
+    // Company Header
+    doc.setFontSize(14)
+    doc.setTextColor(30, 64, 175)
+    doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, 10, { align: 'center' })
+
+    // Line separator
+    doc.setDrawColor(200, 200, 200)
+    doc.line(20, 24, 190, 24)
 
     // Header
     doc.setFontSize(20)
     doc.setTextColor(30, 64, 175)
-    doc.text('Feedback Details', 105, 20, { align: 'center' })
+    doc.text('Feedback Details', 105, 35, { align: 'center' })
 
     // Feedback Number
     doc.setFontSize(14)
     doc.setTextColor(0, 0, 0)
-    doc.text(`Feedback #${feedback.feedbackNo}`, 105, 35, { align: 'center' })
+    doc.text(`Feedback #${feedback.feedbackNo}`, 105, 50, { align: 'center' })
 
     // Line separator
     doc.setDrawColor(200, 200, 200)
-    doc.line(20, 42, 190, 42)
+    doc.line(20, 57, 190, 57)
 
-    let yPos = 50
+    let yPos = 65
 
     // Train Information
     doc.setFontSize(12)
@@ -240,26 +273,37 @@ const FeedbackFinder = () => {
 
     // Footer
     doc.setFontSize(8)
+    doc.setTextColor(100, 100, 100)
+    doc.line(20, doc.internal.pageSize.height - 20, 190, doc.internal.pageSize.height - 20)
+    doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, doc.internal.pageSize.height - 16, { align: 'center' })
+    doc.text('Regd. Off: 14/1, Nirode Behari Mullick Road, Kolkata - 700 006', 105, doc.internal.pageSize.height - 12, { align: 'center' })
+    doc.text('Phone: 033-6535 8154 | E-mail: ybcolcs@yahoo.in', 105, doc.internal.pageSize.height - 8, { align: 'center' })
+    
+    // Page number
     doc.setTextColor(150, 150, 150)
     doc.text(
       `Page 1 of 1`,
       105,
-      doc.internal.pageSize.height - 10,
+      doc.internal.pageSize.height - 4,
       { align: 'center' }
     )
 
     doc.save(`feedback_${feedback.feedbackNo}_${feedback.trainNo}.pdf`)
     toast.success('PDF downloaded successfully!')
+    } catch (error) {
+      console.error('Error downloading PDF:', error)
+      toast.error('Error downloading PDF: ' + error.message)
+    }
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="w-full max-w-7xl mx-auto px-4">
       <div className="card">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">Find Feedbacks</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Find Feedbacks</h2>
 
         {/* Search Form */}
         <form onSubmit={handleSearch} className="mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <label className="label">Train Number</label>
               <input
@@ -283,10 +327,10 @@ const FeedbackFinder = () => {
               />
             </div>
 
-            <div className="flex items-end gap-2">
+            <div className="flex flex-col sm:flex-row items-end gap-2">
               <button
                 type="submit"
-                className="btn-primary flex-1"
+                className="btn-primary flex-1 w-full sm:w-auto"
                 disabled={loading}
               >
                 {loading ? 'Searching...' : 'Search'}
@@ -294,7 +338,7 @@ const FeedbackFinder = () => {
               <button
                 type="button"
                 onClick={handleReset}
-                className="btn-secondary"
+                className="btn-secondary w-full sm:w-auto"
                 disabled={loading}
               >
                 Reset
@@ -308,13 +352,13 @@ const FeedbackFinder = () => {
           <>
             {feedbacks.length > 0 ? (
               <>
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-semibold">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                  <h3 className="text-lg md:text-xl font-semibold">
                     Found {feedbacks.length} Feedback{feedbacks.length !== 1 ? 's' : ''}
                   </h3>
                   <button
                     onClick={exportToPDF}
-                    className="btn-primary flex items-center gap-2"
+                    className="btn-primary flex items-center justify-center gap-2 w-full md:w-auto"
                   >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -323,35 +367,35 @@ const FeedbackFinder = () => {
                   </button>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="min-w-full bg-white border border-gray-200">
-                    <thead className="bg-gray-100">
+                <div className="overflow-x-auto border rounded-lg">
+                  <table className="w-full bg-white">
+                    <thead className="bg-gray-100 sticky top-0">
                       <tr>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">
+                        <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
                           Feedback No
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">
+                        <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
                           Train
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">
+                        <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
                           From Station
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">
+                        <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
                           To Station
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">
+                        <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
                           Coach
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">
+                        <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
                           PNR
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">
+                        <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
                           Mobile
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">
+                        <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
                           PSI
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">
+                        <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
                           Feedback
                         </th>
                       </tr>
@@ -362,36 +406,36 @@ const FeedbackFinder = () => {
                           key={feedback._id}
                           className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
                         >
-                          <td className="px-4 py-3 text-sm border-b">
+                          <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm border-b">
                             <span className="font-semibold text-blue-600">
                               {feedback.feedbackNo}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-sm border-b">
+                          <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm border-b">
                             <div>
                               <div className="font-medium">{feedback.trainNo}</div>
                               <div className="text-gray-600 text-xs">{feedback.trainName}</div>
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-sm border-b">
+                          <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm border-b">
                             {feedback.fromStation}
                           </td>
-                          <td className="px-4 py-3 text-sm border-b">
+                          <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm border-b">
                             {feedback.toStation}
                           </td>
-                          <td className="px-4 py-3 text-sm border-b">
+                          <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm border-b">
                             {feedback.coachNo}
                           </td>
-                          <td className="px-4 py-3 text-sm border-b">
+                          <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm border-b">
                             {feedback.pnr}
                           </td>
-                          <td className="px-4 py-3 text-sm border-b">
+                          <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm border-b">
                             {feedback.mobile}
                           </td>
-                          <td className="px-4 py-3 text-sm border-b">
+                          <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm border-b">
                             <span className="font-medium">{feedback.psi || 'N/A'}</span>
                           </td>
-                          <td className="px-4 py-3 text-sm border-b">
+                          <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm border-b">
                             {feedback.feedbackText ? (
                               <div className="text-gray-600 text-xs">
                                 {feedback.feedbackText.substring(0, 40)}...
@@ -417,10 +461,10 @@ const FeedbackFinder = () => {
 
                 {/* Detailed View */}
                 <div className="mt-8 space-y-4">
-                  <h4 className="text-lg font-semibold">Detailed Feedbacks</h4>
+                  <h4 className="text-lg md:text-xl font-semibold">Detailed Feedbacks</h4>
                   {feedbacks.map((feedback) => (
-                    <div key={feedback._id} className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                      <div className="flex justify-between items-start mb-4">
+                    <div key={feedback._id} className="bg-gray-50 rounded-lg p-4 md:p-6 border border-gray-200">
+                      <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
                         <div>
                           <span className="text-lg font-bold text-blue-600">
                             Feedback #{feedback.feedbackNo}
@@ -428,7 +472,7 @@ const FeedbackFinder = () => {
                         </div>
                         <button
                           onClick={() => exportSingleFeedbackPDF(feedback)}
-                          className="btn-primary flex items-center gap-2 text-sm px-4 py-2"
+                          className="btn-primary flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 w-full md:w-auto justify-center md:justify-start"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -439,52 +483,52 @@ const FeedbackFinder = () => {
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div className="space-y-2">
-                          <h5 className="font-semibold text-gray-700 border-b pb-1">Train Details</h5>
-                          <div className="text-sm">
+                          <h5 className="font-semibold text-gray-700 border-b pb-1 text-sm md:text-base">Train Details</h5>
+                          <div className="text-xs md:text-sm">
                             <span className="text-gray-600">Train No:</span>
                             <span className="ml-2 font-medium">{feedback.trainNo}</span>
                           </div>
-                          <div className="text-sm">
+                          <div className="text-xs md:text-sm">
                             <span className="text-gray-600">Train Name:</span>
                             <span className="ml-2 font-medium">{feedback.trainName}</span>
                           </div>
-                          <div className="text-sm">
+                          <div className="text-xs md:text-sm">
                             <span className="text-gray-600">From Station:</span>
                             <span className="ml-2 font-medium">{feedback.fromStation}</span>
                           </div>
-                          <div className="text-sm">
+                          <div className="text-xs md:text-sm">
                             <span className="text-gray-600">To Station:</span>
                             <span className="ml-2 font-medium">{feedback.toStation}</span>
                           </div>
-                          <div className="text-sm">
+                          <div className="text-xs md:text-sm">
                             <span className="text-gray-600">Coach:</span>
                             <span className="ml-2 font-medium">{feedback.coachNo}</span>
                           </div>
                         </div>
 
                         <div className="space-y-2">
-                          <h5 className="font-semibold text-gray-700 border-b pb-1">Contact & Technical</h5>
-                          <div className="text-sm">
+                          <h5 className="font-semibold text-gray-700 border-b pb-1 text-sm md:text-base">Contact & Technical</h5>
+                          <div className="text-xs md:text-sm">
                             <span className="text-gray-600">PNR:</span>
                             <span className="ml-2 font-medium">{feedback.pnr}</span>
                           </div>
-                          <div className="text-sm">
+                          <div className="text-xs md:text-sm">
                             <span className="text-gray-600">Mobile:</span>
                             <span className="ml-2 font-medium">{feedback.mobile}</span>
                           </div>
-                          <div className="text-sm">
+                          <div className="text-xs md:text-sm">
                             <span className="text-gray-600">NS-1:</span>
                             <span className="ml-2 font-medium">{feedback.ns1 || 0}</span>
                           </div>
-                          <div className="text-sm">
+                          <div className="text-xs md:text-sm">
                             <span className="text-gray-600">NS-2:</span>
                             <span className="ml-2 font-medium">{feedback.ns2 || 0}</span>
                           </div>
-                          <div className="text-sm">
+                          <div className="text-xs md:text-sm">
                             <span className="text-gray-600">NS-3:</span>
                             <span className="ml-2 font-medium">{feedback.ns3 || 0}</span>
                           </div>
-                          <div className="text-sm">
+                          <div className="text-xs md:text-sm">
                             <span className="text-gray-600">PSI:</span>
                             <span className="ml-2 font-medium text-blue-600">{feedback.psi || 'N/A'}</span>
                           </div>

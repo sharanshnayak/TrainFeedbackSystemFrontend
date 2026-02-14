@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react'
-import axios from 'axios'
+import api from '../services/api'
 
 const AuthContext = createContext()
 
@@ -22,7 +22,9 @@ export const AuthProvider = ({ children }) => {
     
     if (token && userData) {
       setUser(JSON.parse(userData))
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      // api instance automatically reads token from localStorage via interceptor,
+      // but ensure header is set for any direct usage
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
     }
     
     setLoading(false)
@@ -30,7 +32,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (userId, password) => {
     try {
-      const response = await axios.post('/api/auth/login', { userId, password })
+      const response = await api.post('/auth/login', { userId, password })
       
       if (response.data.success) {
         const { token, user } = response.data
@@ -38,7 +40,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('token', token)
         localStorage.setItem('user', JSON.stringify(user))
         
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
         
         setUser(user)
         return { success: true }
@@ -54,7 +56,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    delete axios.defaults.headers.common['Authorization']
+    delete api.defaults.headers.common['Authorization']
     setUser(null)
   }
 

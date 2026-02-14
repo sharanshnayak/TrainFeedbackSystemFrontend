@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import axios from 'axios'
-import jsPDF from 'jspdf'
+import api from '../services/api'
+import { jsPDF } from 'jspdf'
 import 'jspdf-autotable'
 
 const FeedbackSuccess = () => {
@@ -19,7 +19,7 @@ const FeedbackSuccess = () => {
 
   const fetchFeedback = async () => {
     try {
-      const response = await axios.get(`/api/feedback/${id}`)
+      const response = await api.get(`/feedback/${id}`)
       if (response.data.success) {
         setFeedback(response.data.data)
       }
@@ -32,25 +32,35 @@ const FeedbackSuccess = () => {
   }
 
   const generatePDF = () => {
-    if (!feedback) return
+    try {
+      if (!feedback) return
 
-    const doc = new jsPDF()
+      const doc = new jsPDF()
+
+    // Company Header
+    doc.setFontSize(14)
+    doc.setTextColor(30, 64, 175)
+    doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, 10, { align: 'center' })
+
+    // Line separator
+    doc.setDrawColor(200, 200, 200)
+    doc.line(20, 24, 190, 24)
 
     // Header
     doc.setFontSize(20)
     doc.setTextColor(30, 64, 175)
-    doc.text('Feedback Details', 105, 20, { align: 'center' })
+    doc.text('Feedback Details', 105, 35, { align: 'center' })
 
     // Feedback Number
     doc.setFontSize(14)
     doc.setTextColor(0, 0, 0)
-    doc.text(`Feedback #${feedback.feedbackNo}`, 105, 35, { align: 'center' })
+    doc.text(`Feedback #${feedback.feedbackNo}`, 105, 50, { align: 'center' })
 
     // Line separator
     doc.setDrawColor(200, 200, 200)
-    doc.line(20, 42, 190, 42)
+    doc.line(20, 57, 190, 57)
 
-    let yPos = 50
+    let yPos = 65
 
     // Train Information
     doc.setFontSize(12)
@@ -145,17 +155,28 @@ const FeedbackSuccess = () => {
 
     // Footer
     doc.setFontSize(8)
+    doc.setTextColor(100, 100, 100)
+    doc.line(20, doc.internal.pageSize.height - 20, 190, doc.internal.pageSize.height - 20)
+    doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, doc.internal.pageSize.height - 16, { align: 'center' })
+    doc.text('Regd. Off: 14/1, Nirode Behari Mullick Road, Kolkata - 700 006', 105, doc.internal.pageSize.height - 12, { align: 'center' })
+    doc.text('Phone: 033-6535 8154 | E-mail: ybcolcs@yahoo.in', 105, doc.internal.pageSize.height - 8, { align: 'center' })
+    
+    // Page number
     doc.setTextColor(150, 150, 150)
     doc.text(
       `Page 1 of 1`,
       105,
-      doc.internal.pageSize.height - 10,
+      doc.internal.pageSize.height - 4,
       { align: 'center' }
     )
 
     // Save PDF
     doc.save(`feedback_${feedback.feedbackNo}_${feedback.trainNo}.pdf`)
     toast.success('PDF downloaded successfully!')
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      toast.error('Error generating PDF: ' + error.message)
+    }
   }
 
   if (loading) {

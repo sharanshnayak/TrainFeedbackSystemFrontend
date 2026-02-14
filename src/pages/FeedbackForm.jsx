@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import axios from 'axios'
+import api from '../services/api'
 
 const FeedbackForm = () => {
   const navigate = useNavigate()
@@ -52,9 +52,9 @@ const FeedbackForm = () => {
   const fetchDropdownData = async () => {
     try {
       const [trainsRes, stationsRes, coachesRes] = await Promise.all([
-        axios.get('/api/data/trains'),
-        axios.get('/api/data/stations'),
-        axios.get('/api/data/coaches')
+        api.get('/data/trains'),
+        api.get('/data/stations'),
+        api.get('/data/coaches')
       ])
 
       setTrains(trainsRes.data.data)
@@ -68,7 +68,7 @@ const FeedbackForm = () => {
 
   const fetchFeedbackCount = async () => {
     try {
-      const response = await axios.get('/api/feedback/count', {
+      const response = await api.get('/feedback/count', {
         params: {
           trainNo: formData.trainNo,
           date: formData.date
@@ -157,7 +157,7 @@ const FeedbackForm = () => {
     setLoading(true)
 
     try {
-      const response = await axios.post('/api/feedback', formData)
+      const response = await api.post('/feedback', formData)
       
       if (response.data.success) {
         toast.success('Feedback submitted successfully!')
@@ -176,9 +176,9 @@ const FeedbackForm = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="w-full max-w-6xl mx-auto px-4">
       <div className="card">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">Train Feedback Form</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Train Feedback Form</h2>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Feedback Number Display */}
@@ -212,8 +212,8 @@ const FeedbackForm = () => {
                 required
               >
                 <option value="">Select Train</option>
-                {trains.map((train) => (
-                  <option key={train.trainNo} value={train.trainNo}>
+                {trains.map((train, index) => (
+                  <option key={`train-${index}-${train.trainNo}`} value={train.trainNo}>
                     {train.trainNo} - {train.trainName}
                   </option>
                 ))}
@@ -284,8 +284,8 @@ const FeedbackForm = () => {
                 required
               >
                 <option value="">Select Coach</option>
-                {coaches.map((coach) => (
-                  <option key={coach} value={coach}>
+                {coaches.map((coach, index) => (
+                  <option key={`coach-${index}-${coach}`} value={coach}>
                     {coach}
                   </option>
                 ))}

@@ -35,11 +35,12 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-700">
-      <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-700 px-4">
+      <div className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Train Feedback System</h1>
-          <p className="text-gray-600">Please login to continue</p>
+          <h1 className="text-xl md:text-3xl font-bold text-gray-800 mb-2">Young Bengal Co-Operative Labour Contract Society Ltd.</h1>
+          <h2 className="text-2xl md:text-2xl font-bold text-blue-600 mb-2">Train Feedback System</h2>
+          <p className="text-sm md:text-base text-gray-600">Please login to continue</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -70,7 +71,7 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full btn-primary"
+            className="w-full btn-primary text-base md:text-base py-2"
             disabled={loading}
           >
             {loading ? 'Logging in...' : 'Login'}
@@ -78,7 +79,7 @@ const Login = () => {
         </form>
 
         <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-gray-600 text-center">
+          <p className="text-xs md:text-sm text-gray-600 text-center">
             <strong>Demo Credentials:</strong><br />
             User ID: admin | Password: admin123
           </p>
