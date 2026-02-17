@@ -243,7 +243,7 @@ const FeedbackForm = () => {
             <div>
               <label className="label">Feedback Rating (Required if no text provided) *</label>
               <div className="flex gap-4 flex-wrap">
-                {['poor', 'good', 'very good', 'excellent'].map((rating) => (
+                {['poor', 'average', 'good', 'very good', 'excellent'].map((rating) => (
                   <label key={rating} className="flex items-center space-x-2 cursor-pointer">
                     <input type="radio" name="feedbackRating" value={rating} checked={formData.feedbackRating === rating} onChange={handleChange} className="w-4 h-4" />
                     <span className="capitalize">{rating}</span>
