@@ -88,7 +88,7 @@ const FeedbackFinder = () => {
     const tableData = feedbacks.map(fb => [
       fb.feedbackNo,
       fb.trainName,
-      `${fb.fromStation} → ${fb.toStation}`,
+      '-',
       fb.coachNo,
       fb.psi || 'N/A',
       fb.feedbackRating || 'Text',
@@ -193,8 +193,7 @@ const FeedbackFinder = () => {
     yPos += 6
     doc.text(`Train Name: ${feedback.trainName}`, 20, yPos)
     yPos += 6
-    doc.text(`From: ${feedback.fromStation}`, 20, yPos)
-    doc.text(`To: ${feedback.toStation}`, 110, yPos)
+    // From/To stations removed from data model
     yPos += 6
     doc.text(`Coach: ${feedback.coachNo}`, 20, yPos)
     yPos += 10
@@ -378,10 +377,7 @@ const FeedbackFinder = () => {
                           Train
                         </th>
                         <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
-                          From Station
-                        </th>
-                        <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
-                          To Station
+                          Coach
                         </th>
                         <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
                           Coach
@@ -416,12 +412,6 @@ const FeedbackFinder = () => {
                               <div className="font-medium">{feedback.trainNo}</div>
                               <div className="text-gray-600 text-xs">{feedback.trainName}</div>
                             </div>
-                          </td>
-                          <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm border-b">
-                            {feedback.fromStation}
-                          </td>
-                          <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm border-b">
-                            {feedback.toStation}
                           </td>
                           <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm border-b">
                             {feedback.coachNo}
@@ -492,14 +482,7 @@ const FeedbackFinder = () => {
                             <span className="text-gray-600">Train Name:</span>
                             <span className="ml-2 font-medium">{feedback.trainName}</span>
                           </div>
-                          <div className="text-xs md:text-sm">
-                            <span className="text-gray-600">From Station:</span>
-                            <span className="ml-2 font-medium">{feedback.fromStation}</span>
-                          </div>
-                          <div className="text-xs md:text-sm">
-                            <span className="text-gray-600">To Station:</span>
-                            <span className="ml-2 font-medium">{feedback.toStation}</span>
-                          </div>
+                          {/* From/To stations removed */}
                           <div className="text-xs md:text-sm">
                             <span className="text-gray-600">Coach:</span>
                             <span className="ml-2 font-medium">{feedback.coachNo}</span>

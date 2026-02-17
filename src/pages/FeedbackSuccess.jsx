@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -75,8 +73,8 @@ const FeedbackSuccess = () => {
     yPos += 6
     doc.text(`Train Name: ${feedback.trainName}`, 20, yPos)
     yPos += 6
-    doc.text(`From: ${feedback.fromStation}`, 20, yPos)
-    doc.text(`To: ${feedback.toStation}`, 110, yPos)
+    // from/to stations removed — no longer displayed
+    // keep coach info on its own line
     yPos += 6
     doc.text(`Coach: ${feedback.coachNo}`, 20, yPos)
     yPos += 10
@@ -236,10 +234,7 @@ const FeedbackSuccess = () => {
               <p className="text-sm text-gray-600">Train:</p>
               <p className="font-semibold">{feedback.trainNo} - {feedback.trainName}</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Route:</p>
-              <p className="font-semibold">{feedback.fromStation} → {feedback.toStation}</p>
-            </div>
+            {/* Route removed - stations no longer collected */}
             <div>
               <p className="text-sm text-gray-600">Coach No:</p>
               <p className="font-semibold">{feedback.coachNo}</p>
