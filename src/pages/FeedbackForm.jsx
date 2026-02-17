@@ -106,7 +106,7 @@ const FeedbackForm = () => {
             <div>
               <label className="label">Feedback Number *</label>
               <input
-                type="text"
+                type="number"
                 name="feedbackNo"
                 value={formData.feedbackNo}
                 onChange={handleChange}
