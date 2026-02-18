@@ -75,13 +75,22 @@ const FeedbackFinder = () => {
       // Small gap
       const headerY = 36
 
+      // Helper function to format date as dd/mm/yyyy
+      const formatDate = (dateStr) => {
+        const d = new Date(dateStr)
+        const day = String(d.getDate()).padStart(2, '0')
+        const month = String(d.getMonth() + 1).padStart(2, '0')
+        const year = d.getFullYear()
+        return `${day}/${month}/${year}`
+      }
+
       // Single-row header: Train No (left), Train Name (center), Report Date (right)
       doc.setFontSize(12)
       doc.setFont('helvetica', 'bold')
       const trainNameForHeader = feedbacks[0]?.trainName || ''
       doc.text(`Train No: ${trainNo}`, 20, headerY)
-      doc.text(`${trainNameForHeader}`, 105, headerY, { align: 'center' })
-      doc.text(`Report Date: ${new Date(date).toLocaleDateString()}`, 190, headerY, { align: 'right' })
+      doc.text(`Train Name: ${trainNameForHeader}`, 105, headerY, { align: 'center' })
+      doc.text(`Report Date: ${formatDate(date)}`, 190, headerY, { align: 'right' })
 
       // Table start
       const tableStartY = headerY + 10
@@ -101,6 +110,7 @@ const FeedbackFinder = () => {
 
       doc.autoTable({
         startY: tableStartY,
+        margin: { left: 10, right: 10 },
         head: [[
           'Sr. No.',
           'Feedback No.',
@@ -115,19 +125,19 @@ const FeedbackFinder = () => {
         ]],
         body,
         theme: 'striped',
-        headStyles: { fillColor: [30, 64, 175], textColor: 255, fontStyle: 'bold' },
-        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fillColor: [30, 64, 175], textColor: 255, fontStyle: 'bold', fontSize: 8, valign: 'middle' },
+        styles: { fontSize: 9, cellPadding: 2, valign: 'middle' },
         columnStyles: {
-          0: { cellWidth: 12 },
-          1: { cellWidth: 20 },
-          2: { cellWidth: 14 },
-          3: { cellWidth: 18 },
-          4: { cellWidth: 18 },
-          5: { cellWidth: 10 },
-          6: { cellWidth: 10 },
-          7: { cellWidth: 10 },
-          8: { cellWidth: 12 },
-          9: { cellWidth: 36 }
+          0: { cellWidth: 10 },
+          1: { cellWidth: 17 },
+          2: { cellWidth: 12 },
+          3: { cellWidth: 14 },
+          4: { cellWidth: 16 },
+          5: { cellWidth: 9 },
+          6: { cellWidth: 9 },
+          7: { cellWidth: 9 },
+          8: { cellWidth: 10 },
+          9: { cellWidth: 30 }
         }
       })
 
@@ -135,12 +145,12 @@ const FeedbackFinder = () => {
       const finalY = (doc.lastAutoTable && doc.lastAutoTable.finalY) || (tableStartY + 8)
       let y = finalY + 8
       doc.setFont('helvetica', 'bold')
-      doc.setFontSize(11)
-      doc.text('Total feedbacks', 20, y)
+      doc.setFontSize(10)
+      doc.text('Total feedbacks', 10, y)
       y += 8
-      doc.text('Total No percentage of PSI for the Rake', 20, y)
+      doc.text('Total No percentage of PSI for the Rake', 10, y)
       y += 8
-      doc.text('Average PSI of Rake for the round trip', 20, y)
+      doc.text('Average PSI of Rake for the round trip', 10, y)
 
       // Footer on each page
 
