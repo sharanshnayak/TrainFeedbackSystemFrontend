@@ -91,7 +91,7 @@ const FeedbackFinder = () => {
       }
 
       // Single-row header: Train No (left), Train Name (center), Report Date (right)
-      doc.setFontSize(12)
+      doc.setFontSize(9)
       doc.setFont('helvetica', 'bold')
       const trainNameForHeader = feedbacks[0]?.trainName || ''
       doc.text(`Train No: ${trainNo}`, 20, headerY)
@@ -147,16 +147,26 @@ const FeedbackFinder = () => {
         }
       })
 
-      // After table: three label rows (no numeric data)
+      // After table: three label rows with values
       const finalY = (doc.lastAutoTable && doc.lastAutoTable.finalY) || (tableStartY + 8)
       let y = finalY + 8
+      
+      // Calculate metrics
+      const totalCount = feedbacks.length
+      const psiSum = feedbacks.reduce((sum, fb) => sum + (parseInt(fb.psi) || 0), 0)
+      const percentageAtPSI = totalCount > 0 ? ((psiSum / totalCount)).toFixed(2) : '0'
+      const averagePSI = totalCount > 0 ? (psiSum).toFixed(2) : '0'
+      
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(10)
       doc.text('Total feedbacks', 10, y)
+      doc.text(totalCount.toString(), 120, y)
       y += 8
       doc.text('Total No percentage of PSI for the Rake', 10, y)
+      doc.text(`${percentageAtPSI}%`, 120, y)
       y += 8
       doc.text('Average PSI of Rake for the round trip', 10, y)
+      doc.text(averagePSI, 120, y)
 
       // Footer on each page
 
@@ -334,6 +344,11 @@ const FeedbackFinder = () => {
         dataToSubmit.feedbackText = dataToSubmit.feedbackRating
       }
       
+      // Set default values for ns1, ns2, ns3 if empty
+      if (!dataToSubmit.ns1 || dataToSubmit.ns1 === '') dataToSubmit.ns1 = 0
+      if (!dataToSubmit.ns2 || dataToSubmit.ns2 === '') dataToSubmit.ns2 = 0
+      if (!dataToSubmit.ns3 || dataToSubmit.ns3 === '') dataToSubmit.ns3 = 0
+      
       const response = await api.put(`/feedback/${editingFeedback._id}`, dataToSubmit)
       if (response.data.success) {
         toast.success('Feedback updated successfully!')
@@ -467,9 +482,6 @@ const FeedbackFinder = () => {
                           Coach
                         </th>
                         <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
-                          Coach
-                        </th>
-                        <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
                           PNR
                         </th>
                         <th className="px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm font-semibold text-gray-700 border-b">
@@ -557,34 +569,29 @@ const FeedbackFinder = () => {
                             </svg>
                             Download PDF
                           </button>
-                          <button
-                            onClick={() => handleEditClick(feedback)}
-                            disabled={user?.role !== 'operator'}
-                            className={`flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 rounded w-full md:w-auto justify-center ${
-                              user?.role === 'operator'
-                                ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                                : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                            }`}
-                          >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(feedback._id)}
-                            disabled={deleting === feedback._id || user?.role !== 'operator'}
-                            className={`flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 rounded w-full md:w-auto justify-center ${
-                              user?.role === 'operator'
-                                ? 'bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white'
-                                : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                            }`}
-                          >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Delete
-                          </button>
+                          {user?.role === 'operator' && (
+                            <>
+                              <button
+                                onClick={() => handleEditClick(feedback)}
+                                className="btn-primary flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 w-full md:w-auto justify-center bg-blue-500 hover:bg-blue-600 text-white"
+                              >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteClick(feedback._id)}
+                                disabled={deleting === feedback._id}
+                                className="flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 rounded w-full md:w-auto justify-center bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white"
+                              >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Delete
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                       
