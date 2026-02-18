@@ -128,7 +128,7 @@ const FeedbackFinder = () => {
         headStyles: { fillColor: [30, 64, 175], textColor: 255, fontStyle: 'bold', fontSize: 9, valign: 'middle'},
         styles: { fontSize: 9, valign: 'middle', minCellHeight: 12 },
         columnStyles: {
-          0: { cellWidth: 10, fontSize: 8 },
+          0: { cellWidth: 13, fontSize: 8 },
           1: { cellWidth: 25, fontSize: 9 },
           2: { cellWidth: 15, fontSize: 9 },
           3: { cellWidth: 25, fontSize: 9 },
@@ -137,7 +137,7 @@ const FeedbackFinder = () => {
           6: { cellWidth: 12, fontSize: 8 },
           7: { cellWidth: 12, fontSize: 8 },
           8: { cellWidth: 10, fontSize: 8 },
-          9: { cellWidth: 50, fontSize: 9 }
+          9: { cellWidth: 45, fontSize: 9 }
         }
       })
 
