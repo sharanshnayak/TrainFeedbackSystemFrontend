@@ -60,91 +60,93 @@ const FeedbackFinder = () => {
 
       const doc = new jsPDF()
 
-    // Company Header (only company name on top)
-    doc.setFontSize(14)
-    doc.setTextColor(30, 64, 175)
-    doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, 12, { align: 'center' })
+      // Company Header block
+      doc.setFontSize(14)
+      doc.setTextColor(30, 64, 175)
+      doc.setFont('helvetica', 'bold')
+      doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 20, 14)
 
-    // Line separator (moved closer)
-    doc.setDrawColor(200, 200, 200)
-    doc.line(20, 20, 190, 20)
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(0, 0, 0)
+      doc.text('Regd. Off: 14/1, Nirode Behari Mullick Road, Kolkata - 700 006', 20, 20)
+      doc.text('Phone: 033-6535 8154 | E-mail: ybcolcs@yahoo.in', 20, 26)
 
-    // Header (moved up to reduce gap)
-    doc.setFontSize(18)
-    doc.setTextColor(30, 64, 175)
-    doc.text('Train Feedback Report', 105, 28, { align: 'center' })
+      // Small gap
+      const headerY = 36
 
-    doc.setFontSize(12)
-    doc.setTextColor(0, 0, 0)
-    doc.text(`Train No: ${trainNo}`, 105, 34, { align: 'center' })
-    doc.text(`Date: ${new Date(date).toLocaleDateString()}`, 105, 40, { align: 'center' })
-    doc.text(`Total Feedbacks: ${feedbacks.length}`, 105, 46, { align: 'center' })
+      // Single-row header: Train No (left), Train Name (center), Report Date (right)
+      doc.setFontSize(12)
+      doc.setFont('helvetica', 'bold')
+      const trainNameForHeader = feedbacks[0]?.trainName || ''
+      doc.text(`Train No: ${trainNo}`, 20, headerY)
+      doc.text(`${trainNameForHeader}`, 105, headerY, { align: 'center' })
+      doc.text(`Report Date: ${new Date(date).toLocaleDateString()}`, 190, headerY, { align: 'right' })
 
-    // Line separator (below header)
-    doc.setDrawColor(200, 200, 200)
-    doc.line(20, 52, 190, 52)
+      // Table start
+      const tableStartY = headerY + 10
 
-    // Table data
-    const tableData = feedbacks.map(fb => [
-      fb.feedbackNo,
-      fb.trainName,
-      '-',
-      fb.coachNo,
-      fb.psi || 'N/A',
-      fb.feedbackRating || 'Text',
-      new Date(fb.createdAt).toLocaleDateString()
-    ])
+      const body = feedbacks.map((fb, idx) => [
+        idx + 1,
+        fb.feedbackNo ?? '',
+        fb.coachNo ?? '',
+        fb.pnr ?? '',
+        fb.mobile ?? '',
+        fb.ns1 ?? '',
+        fb.ns2 ?? '',
+        fb.ns3 ?? '',
+        fb.psi ?? '',
+        fb.feedbackRating ? String(fb.feedbackRating).toUpperCase() : (fb.feedbackText ? 'TEXT' : '')
+      ])
 
-    doc.autoTable({
-      startY: 60,
-      head: [['#', 'Train', 'Route', 'Coach', 'PSI', 'Rating', 'Date']],
-      body: tableData,
-      theme: 'striped',
-      headStyles: {
-        fillColor: [30, 64, 175],
-        textColor: 255,
-        fontStyle: 'bold'
-      },
-      styles: {
-        fontSize: 8,
-        cellPadding: 2
-      },
-      columnStyles: {
-        0: { cellWidth: 12 },
-        1: { cellWidth: 30 },
-        2: { cellWidth: 35 },
-        3: { cellWidth: 18 },
-        4: { cellWidth: 15 },
-        5: { cellWidth: 18 },
-        6: { cellWidth: 23 }
-      }
-    })
+      doc.autoTable({
+        startY: tableStartY,
+        head: [[
+          'Sr. No.',
+          'Feedback No.',
+          'Coach',
+          'PNR',
+          'Mobile No.',
+          'NS-1',
+          'NS-2',
+          'NS-3',
+          'PSI',
+          'FEEDBACK STATUS'
+        ]],
+        body,
+        theme: 'striped',
+        headStyles: { fillColor: [30, 64, 175], textColor: 255, fontStyle: 'bold' },
+        styles: { fontSize: 9, cellPadding: 3 },
+        columnStyles: {
+          0: { cellWidth: 12 },
+          1: { cellWidth: 20 },
+          2: { cellWidth: 14 },
+          3: { cellWidth: 18 },
+          4: { cellWidth: 18 },
+          5: { cellWidth: 10 },
+          6: { cellWidth: 10 },
+          7: { cellWidth: 10 },
+          8: { cellWidth: 12 },
+          9: { cellWidth: 36 }
+        }
+      })
 
-    // Footer
-    const pageCount = doc.internal.getNumberOfPages()
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i)
-      
-      // Company info footer
-      doc.setFontSize(8)
-      doc.setTextColor(100, 100, 100)
-      doc.line(20, doc.internal.pageSize.height - 20, 190, doc.internal.pageSize.height - 20)
-      doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, doc.internal.pageSize.height - 16, { align: 'center' })
-      doc.text('Regd. Off: 14/1, Nirode Behari Mullick Road, Kolkata - 700 006', 105, doc.internal.pageSize.height - 12, { align: 'center' })
-      doc.text('Phone: 033-6535 8154 | E-mail: ybcolcs@yahoo.in', 105, doc.internal.pageSize.height - 8, { align: 'center' })
-      
-      // Page number
-      doc.setTextColor(150, 150, 150)
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        105,
-        doc.internal.pageSize.height - 4,
-        { align: 'center' }
-      )
-    }
+      // After table: three label rows (no numeric data)
+      const finalY = (doc.lastAutoTable && doc.lastAutoTable.finalY) || (tableStartY + 8)
+      let y = finalY + 8
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(11)
+      doc.text('Total feedbacks', 20, y)
+      y += 8
+      doc.text('Total No percentage of PSI for the Rake', 20, y)
+      y += 8
+      doc.text('Average PSI of Rake for the round trip', 20, y)
 
-    doc.save(`feedbacks_${trainNo}_${new Date(date).toISOString().split('T')[0]}.pdf`)
-    toast.success('PDF exported successfully!')
+      // Footer on each page
+
+
+      doc.save(`feedbacks_${trainNo}_${new Date(date).toISOString().split('T')[0]}.pdf`)
+      toast.success('PDF exported successfully!')
     } catch (error) {
       console.error('Error exporting PDF:', error)
       toast.error('Error exporting PDF: ' + error.message)
