@@ -10,6 +10,10 @@ const FeedbackFinder = () => {
   const [feedbacks, setFeedbacks] = useState([])
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
+  const [editingFeedback, setEditingFeedback] = useState(null)
+  const [editForm, setEditForm] = useState({})
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [deleting, setDeleting] = useState(null)
 
   const handleSearch = async (e) => {
     e.preventDefault()
@@ -307,6 +311,67 @@ const FeedbackFinder = () => {
     }
   }
 
+  const handleEditClick = (feedback) => {
+    setEditingFeedback(feedback)
+    setEditForm({ ...feedback })
+    setShowEditModal(true)
+  }
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target
+    setEditForm({ ...editForm, [name]: value })
+  }
+
+  const handleSaveEdit = async () => {
+    try {
+      const response = await api.put(`/feedback/${editingFeedback._id}`, editForm)
+      if (response.data.success) {
+        toast.success('Feedback updated successfully!')
+        setShowEditModal(false)
+        setEditingFeedback(null)
+        setEditForm({})
+        // Refresh feedbacks
+        const searchResponse = await api.get('/feedback/search', {
+          params: { trainNo, date }
+        })
+        if (searchResponse.data.success) {
+          setFeedbacks(searchResponse.data.data)
+        }
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Error updating feedback')
+      console.error(error)
+    }
+  }
+
+  const handleDeleteClick = (feedbackId) => {
+    if (window.confirm('Are you sure you want to delete this feedback?')) {
+      setDeleting(feedbackId)
+      handleDeleteConfirm(feedbackId)
+    }
+  }
+
+  const handleDeleteConfirm = async (feedbackId) => {
+    try {
+      const response = await api.delete(`/feedback/${feedbackId}`)
+      if (response.data.success) {
+        toast.success('Feedback deleted successfully!')
+        setDeleting(null)
+        // Refresh feedbacks
+        const searchResponse = await api.get('/feedback/search', {
+          params: { trainNo, date }
+        })
+        if (searchResponse.data.success) {
+          setFeedbacks(searchResponse.data.data)
+        }
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Error deleting feedback')
+      console.error(error)
+      setDeleting(null)
+    }
+  }
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4">
       <div className="card">
@@ -472,15 +537,36 @@ const FeedbackFinder = () => {
                             Feedback #{feedback.feedbackNo}
                           </span>
                         </div>
-                        <button
-                          onClick={() => exportSingleFeedbackPDF(feedback)}
-                          className="btn-primary flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 w-full md:w-auto justify-center md:justify-start"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          Download PDF
-                        </button>
+                        <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                          <button
+                            onClick={() => exportSingleFeedbackPDF(feedback)}
+                            className="btn-primary flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 w-full md:w-auto justify-center"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Download PDF
+                          </button>
+                          <button
+                            onClick={() => handleEditClick(feedback)}
+                            className="bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 rounded w-full md:w-auto justify-center"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(feedback._id)}
+                            disabled={deleting === feedback._id}
+                            className="bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 rounded w-full md:w-auto justify-center"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Delete
+                          </button>
+                        </div>
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -565,6 +651,150 @@ const FeedbackFinder = () => {
           </>
         )}
       </div>
+
+      {/* Edit Modal */}
+      {showEditModal && editingFeedback && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-96 overflow-y-auto">
+            <div className="p-6">
+              <h3 className="text-xl font-bold mb-4">Edit Feedback #{editingFeedback.feedbackNo}</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label className="label">Feedback No.</label>
+                  <input
+                    type="number"
+                    name="feedbackNo"
+                    value={editForm.feedbackNo || ''}
+                    onChange={handleEditChange}
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="label">Train No.</label>
+                  <input
+                    type="text"
+                    name="trainNo"
+                    value={editForm.trainNo || ''}
+                    onChange={handleEditChange}
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="label">Train Name</label>
+                  <input
+                    type="text"
+                    name="trainName"
+                    value={editForm.trainName || ''}
+                    onChange={handleEditChange}
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="label">Coach No.</label>
+                  <input
+                    type="text"
+                    name="coachNo"
+                    value={editForm.coachNo || ''}
+                    onChange={handleEditChange}
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="label">PNR</label>
+                  <input
+                    type="text"
+                    name="pnr"
+                    value={editForm.pnr || ''}
+                    onChange={handleEditChange}
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="label">Mobile No.</label>
+                  <input
+                    type="text"
+                    name="mobile"
+                    value={editForm.mobile || ''}
+                    onChange={handleEditChange}
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="label">NS-1</label>
+                  <input
+                    type="number"
+                    name="ns1"
+                    value={editForm.ns1 || ''}
+                    onChange={handleEditChange}
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="label">NS-2</label>
+                  <input
+                    type="number"
+                    name="ns2"
+                    value={editForm.ns2 || ''}
+                    onChange={handleEditChange}
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="label">NS-3</label>
+                  <input
+                    type="number"
+                    name="ns3"
+                    value={editForm.ns3 || ''}
+                    onChange={handleEditChange}
+                    className="input-field"
+                  />
+                </div>
+                <div>
+                  <label className="label">PSI</label>
+                  <input
+                    type="number"
+                    name="psi"
+                    value={editForm.psi || ''}
+                    onChange={handleEditChange}
+                    className="input-field"
+                  />
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <label className="label">Feedback Text</label>
+                <textarea
+                  name="feedbackText"
+                  value={editForm.feedbackText || ''}
+                  onChange={handleEditChange}
+                  rows="3"
+                  className="input-field"
+                />
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  onClick={handleSaveEdit}
+                  className="btn-primary flex-1"
+                >
+                  Save Changes
+                </button>
+                <button
+                  onClick={() => {
+                    setShowEditModal(false)
+                    setEditingFeedback(null)
+                    setEditForm({})
+                  }}
+                  className="btn-secondary flex-1"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
