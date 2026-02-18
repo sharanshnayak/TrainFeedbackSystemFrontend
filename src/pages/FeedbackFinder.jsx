@@ -326,7 +326,15 @@ const FeedbackFinder = () => {
 
   const handleSaveEdit = async () => {
     try {
-      const response = await api.put(`/feedback/${editingFeedback._id}`, editForm)
+      // Prepare data for submission
+      const dataToSubmit = { ...editForm }
+      
+      // If no feedback text but rating exists, store rating in feedbackText field
+      if (!dataToSubmit.feedbackText && dataToSubmit.feedbackRating) {
+        dataToSubmit.feedbackText = dataToSubmit.feedbackRating
+      }
+      
+      const response = await api.put(`/feedback/${editingFeedback._id}`, dataToSubmit)
       if (response.data.success) {
         toast.success('Feedback updated successfully!')
         setShowEditModal(false)
