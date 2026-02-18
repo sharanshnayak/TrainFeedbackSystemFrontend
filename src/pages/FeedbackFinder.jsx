@@ -436,13 +436,7 @@ const FeedbackFinder = () => {
                   </h3>
                   <button
                     onClick={exportToPDF}
-                    disabled={user?.role !== 'operator'}
-                    title={user?.role !== 'operator' ? 'Only operators can export PDF' : ''}
-                    className={`flex items-center justify-center gap-2 w-full md:w-auto ${
-                      user?.role === 'operator'
-                        ? 'btn-primary'
-                        : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                    }`}
+                    className="btn-primary flex items-center justify-center gap-2 w-full md:w-auto"
                   >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -548,13 +542,7 @@ const FeedbackFinder = () => {
                         <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
                           <button
                             onClick={() => exportSingleFeedbackPDF(feedback)}
-                            disabled={user?.role !== 'operator'}
-                            title={user?.role !== 'operator' ? 'Only operators can download PDF' : ''}
-                            className={`flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 w-full md:w-auto justify-center rounded ${
-                              user?.role === 'operator'
-                                ? 'btn-primary'
-                                : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                            }`}
+                            className="btn-primary flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 w-full md:w-auto justify-center"
                           >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -563,7 +551,12 @@ const FeedbackFinder = () => {
                           </button>
                           <button
                             onClick={() => handleEditClick(feedback)}
-                            className="bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 rounded w-full md:w-auto justify-center"
+                            disabled={user?.role !== 'operator'}
+                            className={`flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 rounded w-full md:w-auto justify-center ${
+                              user?.role === 'operator'
+                                ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                                : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                            }`}
                           >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -572,8 +565,12 @@ const FeedbackFinder = () => {
                           </button>
                           <button
                             onClick={() => handleDeleteClick(feedback._id)}
-                            disabled={deleting === feedback._id}
-                            className="bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 rounded w-full md:w-auto justify-center"
+                            disabled={deleting === feedback._id || user?.role !== 'operator'}
+                            className={`flex items-center gap-2 text-xs md:text-sm px-3 md:px-4 py-2 rounded w-full md:w-auto justify-center ${
+                              user?.role === 'operator'
+                                ? 'bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white'
+                                : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                            }`}
                           >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -786,6 +783,27 @@ const FeedbackFinder = () => {
                   className="input-field"
                 />
               </div>
+
+              {!editForm.feedbackText && (
+                <div className="mb-6">
+                  <label className="label">Feedback Rating (Required if no text provided) *</label>
+                  <div className="flex gap-4 flex-wrap">
+                    {['poor', 'average', 'good', 'very good', 'excellent'].map((rating) => (
+                      <label key={rating} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="feedbackRating"
+                          value={rating}
+                          checked={editForm.feedbackRating === rating}
+                          onChange={handleEditChange}
+                          className="w-4 h-4"
+                        />
+                        <span className="capitalize">{rating}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="flex gap-4">
                 <button
