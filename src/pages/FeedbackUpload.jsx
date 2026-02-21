@@ -41,9 +41,15 @@ export default function FeedbackUpload() {
         },
       });
 
+      console.log('=== FRONTEND RECEIVED RESPONSE ===');
+      console.log('Response data:', response.data);
+      console.log('SheetData:', response.data.sheetData);
+      console.log('First feedback trainName:', response.data.feedbacks[0]?.trainName);
+
       if (response.data.success || response.data.feedbacks.length > 0) {
         setUploadedFeedbacks(response.data.feedbacks);
         setSheetData(response.data.sheetData || []);
+        console.log('Set sheetData to:', response.data.sheetData);
         if (response.data.extractionErrors && response.data.extractionErrors.length > 0) {
           setErrors(response.data.extractionErrors);
         }
@@ -109,7 +115,11 @@ export default function FeedbackUpload() {
   const handleDownloadPDF = async () => {
     try {
       setDownloadingPDF(true);
+      console.log('=== handleDownloadPDF CALLED ===');
+      console.log('SheetData state:', sheetData);
+      console.log('SheetData length:', sheetData?.length);
       if (sheetData && sheetData.length > 0) {
+        console.log('Calling generateConsolidatedPDF with:', JSON.stringify(sheetData, null, 2));
         generateConsolidatedPDF(sheetData);
       } else {
         alert('No data to generate PDF');

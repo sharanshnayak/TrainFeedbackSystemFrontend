@@ -29,29 +29,29 @@ export const generateConsolidatedPDF = (sheetData) => {
         doc.addPage();
       }
 
-      // Company Header
-      doc.setFontSize(14);
+      // Company Header (reduced size)
+      doc.setFontSize(11);
       doc.setTextColor(30, 64, 175);
       doc.setFont('helvetica', 'bold');
-      doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 20, 14);
+      doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 15, 10);
 
-      doc.setFontSize(10);
+      doc.setFontSize(8);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(0, 0, 0);
-      doc.text('Regd. Off: 14/1, Nirode Behari Mullick Road, Kolkata - 700 006', 20, 20);
-      doc.text('Phone: 033-6535 8154 | E-mail: ybcolcs@yahoo.in', 20, 26);
+      doc.text('Regd. Off: 14/1, Nirode Behari Mullick Road, Kolkata - 700 006', 15, 15);
+      doc.text('Phone: 033-6535 8154 | E-mail: ybcolcs@yahoo.in', 15, 18.5);
 
-      const headerY = 36;
+      const headerY = 23;
 
-      // Train info header
-      doc.setFontSize(9);
+      // Train info header (compact)
+      doc.setFontSize(8);
       doc.setFont('helvetica', 'bold');
-      doc.text(`Train No: ${sheet.trainNo}`, 20, headerY);
-      doc.text(`Train Name: ${sheet.trainName}`, 105, headerY, { align: 'center' });
-      doc.text(`Report Date: ${formatDate(sheet.reportDate)}`, 190, headerY, { align: 'right' });
+      doc.text(`Train No: ${sheet.trainNo}`, 15, headerY);
+      doc.text(`Train Name: ${sheet.trainName}`, 100, headerY, { align: 'center' });
+      doc.text(`Report Date: ${formatDate(sheet.reportDate)}`, 185, headerY, { align: 'right' });
 
       // Table start
-      const tableStartY = headerY + 10;
+      const tableStartY = headerY + 4;
 
       const body = sheet.feedbacks.map((fb, idx) => [
         idx + 1,
@@ -72,22 +72,22 @@ export const generateConsolidatedPDF = (sheetData) => {
       const totalNS3 = sheet.feedbacks.reduce((sum, fb) => sum + (parseInt(fb.ns3) || 0), 0);
       const totalPSI = sheet.feedbacks.reduce((sum, fb) => sum + (parseInt(fb.psi) || 0), 0);
 
-      body.push(['TOTAL', '', '', '', '', totalNS1, totalNS2, totalNS3, totalPSI, '']);
+      body.push(['Total', '', '', '', '', totalNS1, totalNS2, totalNS3, totalPSI, '']);
 
       doc.autoTable({
         startY: tableStartY,
-        margin: { left: 10, right: 10 },
+        margin: { left: 10, right: 10, bottom: 30 },
         head: [[
           'Sr. No.',
           'Feedback No.',
           'Coach',
           'PNR',
-          'Mobile No.',
+          'Mobile',
           'NS-1',
           'NS-2',
           'NS-3',
           'PSI',
-          'FEEDBACK STATUS'
+          'Feedback Status'
         ]],
         body,
         theme: 'striped',
@@ -95,35 +95,38 @@ export const generateConsolidatedPDF = (sheetData) => {
           fillColor: [30, 64, 175],
           textColor: 255,
           fontStyle: 'bold',
-          fontSize: 9,
-          valign: 'middle'
+          fontSize: 7,
+          valign: 'middle',
+          halign: 'center',
+          cellPadding: 2
         },
-        bodyStyles: { fontSize: 9, valign: 'middle', minCellHeight: 12 },
-        alternateRowStyles: { fillColor: [245, 245, 245] },
+        bodyStyles: { fontSize: 6.5, valign: 'middle', halign: 'center', cellPadding: 1.5, lineColor: 200 },
+        alternateRowStyles: { fillColor: [248, 248, 248] },
         columnStyles: {
-          0: { cellWidth: 15, fontSize: 8 },
-          1: { cellWidth: 25, fontSize: 9 },
-          2: { cellWidth: 15, fontSize: 9 },
-          3: { cellWidth: 25, fontSize: 9 },
-          4: { cellWidth: 25, fontSize: 9 },
-          5: { cellWidth: 12, fontSize: 8 },
-          6: { cellWidth: 12, fontSize: 8 },
-          7: { cellWidth: 12, fontSize: 8 },
-          8: { cellWidth: 10, fontSize: 8 },
-          9: { cellWidth: 40, fontSize: 9 }
+          0: { cellWidth: 12, halign: 'center' },
+          1: { cellWidth: 18, halign: 'center' },
+          2: { cellWidth: 14, halign: 'center' },
+          3: { cellWidth: 20, halign: 'center' },
+          4: { cellWidth: 22, halign: 'center' },
+          5: { cellWidth: 11, halign: 'center' },
+          6: { cellWidth: 11, halign: 'center' },
+          7: { cellWidth: 11, halign: 'center' },
+          8: { cellWidth: 10, halign: 'center' },
+          9: { cellWidth: 30, halign: 'left' }
         },
         didDrawCell: (data) => {
           // Highlight total row
           if (data.row.index === sheet.feedbacks.length) {
             data.cell.styles.fontStyle = 'bold';
-            data.cell.styles.fillColor = [220, 220, 220];
+            data.cell.styles.fillColor = [200, 200, 200];
+            data.cell.styles.fontSize = 7;
           }
         }
       });
 
-      // Summary section after table
+      // Summary section after table (compact)
       const finalY = (doc.lastAutoTable && doc.lastAutoTable.finalY) || (tableStartY + 8);
-      let y = finalY + 8;
+      let y = finalY + 3;
 
       const totalCount = sheet.feedbacks.length;
       const psiSum = sheet.feedbacks.reduce((sum, fb) => sum + (parseInt(fb.psi) || 0), 0);
@@ -131,18 +134,18 @@ export const generateConsolidatedPDF = (sheetData) => {
       const averagePSI = totalCount > 0 ? psiSum.toFixed(2) : '0';
 
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
+      doc.setFontSize(8);
 
-      doc.text('Total feedbacks', 10, y);
-      doc.text(totalCount.toString(), 120, y);
-      y += 8;
+      doc.text('Total Feedbacks:', 10, y);
+      doc.text(totalCount.toString(), 80, y);
+      y += 5;
 
-      doc.text('Total No percentage of PSI for the Rake', 10, y);
-      doc.text(`${percentagePSI}%`, 120, y);
-      y += 8;
+      doc.text('Total No Percentage of PSI for the Rake:', 10, y);
+      doc.text(`${percentagePSI}%`, 80, y);
+      y += 5;
 
-      doc.text('Average PSI of Rake for the round trip', 10, y);
-      doc.text(averagePSI, 120, y);
+      doc.text('Average PSI of Rake for the Round Trip:', 10, y);
+      doc.text(averagePSI, 80, y);
 
       isFirstPage = false;
     });
