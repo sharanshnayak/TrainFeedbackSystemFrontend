@@ -14,13 +14,10 @@ export const generateConsolidatedPDF = (sheetData) => {
     const doc = new jsPDF();
     let isFirstPage = true;
 
-    // Helper to format date
+    // Helper to format date - backend already sends dd/mm/yyyy format
     const formatDate = (dateStr) => {
-      const d = new Date(dateStr);
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const year = d.getFullYear();
-      return `${day}/${month}/${year}`;
+      // dateStr is already in dd/mm/yyyy format from backend, use it directly
+      return dateStr;
     };
 
     // Process each sheet

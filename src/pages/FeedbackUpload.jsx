@@ -290,7 +290,7 @@ export default function FeedbackUpload() {
                     <div>
                       <label className="text-sm text-gray-600">Report Date</label>
                       <p className="font-semibold">
-                        {new Date(feedback.reportDate).toLocaleDateString()}
+                        {feedback.reportDate}
                       </p>
                     </div>
                     <div>
