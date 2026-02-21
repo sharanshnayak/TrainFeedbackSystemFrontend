@@ -41,7 +41,7 @@ export const generateConsolidatedPDF = (sheetData) => {
       doc.text('Regd. Off: 14/1, Nirode Behari Mullick Road, Kolkata - 700 006', 15, 15);
       doc.text('Phone: 033-6535 8154 | E-mail: ybcolcs@yahoo.in', 15, 18.5);
 
-      const headerY = 23;
+      const headerY = 25;
 
       // Train info header (compact)
       doc.setFontSize(8);
@@ -76,7 +76,7 @@ export const generateConsolidatedPDF = (sheetData) => {
 
       doc.autoTable({
         startY: tableStartY,
-        margin: { left: 10, right: 10, bottom: 30 },
+        margin: { left: 17, right: 12, bottom: 30 },
         head: [[
           'Sr. No.',
           'Feedback No.',
@@ -126,7 +126,7 @@ export const generateConsolidatedPDF = (sheetData) => {
 
       // Summary section after table (compact)
       const finalY = (doc.lastAutoTable && doc.lastAutoTable.finalY) || (tableStartY + 8);
-      let y = finalY + 3;
+      let y = finalY + 6;
 
       const totalCount = sheet.feedbacks.length;
       const psiSum = sheet.feedbacks.reduce((sum, fb) => sum + (parseInt(fb.psi) || 0), 0);

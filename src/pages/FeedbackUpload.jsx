@@ -231,7 +231,8 @@ export default function FeedbackUpload() {
                 </button>
                 <button
                   onClick={handleSubmit}
-                  disabled={submitting}
+                  disabled={submitting || errors.length > 0}
+                  title={errors.length > 0 ? 'Fix errors before submitting' : ''}
                   className="bg-green-600 text-white px-8 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
                 >
                   {submitting ? 'Submitting...' : 'Submit All'}
