@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import api from '../services/api';
+import { generateConsolidatedPDF } from '../services/pdfGenerator';
 
 export default function FeedbackUpload() {
   const [file, setFile] = useState(null);
@@ -8,6 +9,8 @@ export default function FeedbackUpload() {
   const [errors, setErrors] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [sheetData, setSheetData] = useState([]);
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -40,6 +43,7 @@ export default function FeedbackUpload() {
 
       if (response.data.success || response.data.feedbacks.length > 0) {
         setUploadedFeedbacks(response.data.feedbacks);
+        setSheetData(response.data.sheetData || []);
         if (response.data.extractionErrors && response.data.extractionErrors.length > 0) {
           setErrors(response.data.extractionErrors);
         }
@@ -59,6 +63,7 @@ export default function FeedbackUpload() {
     setUploadedFeedbacks([]);
     setErrors([]);
     setSubmitted(false);
+    setSheetData([]);
   };
 
   const handleSubmit = async () => {
@@ -98,6 +103,22 @@ export default function FeedbackUpload() {
       setErrors([{ message: error.response?.data?.message || 'Error submitting feedbacks' }]);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    try {
+      setDownloadingPDF(true);
+      if (sheetData && sheetData.length > 0) {
+        generateConsolidatedPDF(sheetData);
+      } else {
+        alert('No data to generate PDF');
+      }
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      alert('Error generating PDF: ' + error.message);
+    } finally {
+      setDownloadingPDF(false);
     }
   };
 
@@ -190,13 +211,22 @@ export default function FeedbackUpload() {
               <h2 className="text-2xl font-bold text-gray-800">
                 Extracted Feedbacks ({uploadedFeedbacks.length})
               </h2>
-              <button
-                onClick={handleSubmit}
-                disabled={submitting}
-                className="bg-green-600 text-white px-8 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
-              >
-                {submitting ? 'Submitting...' : 'Submit All'}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleDownloadPDF}
+                  disabled={downloadingPDF}
+                  className="bg-purple-600 text-white px-8 py-2 rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+                >
+                  {downloadingPDF ? 'Generating PDF...' : 'Download PDF'}
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  className="bg-green-600 text-white px-8 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+                >
+                  {submitting ? 'Submitting...' : 'Submit All'}
+                </button>
+              </div>
             </div>
 
             {/* Feedbacks Grid */}
@@ -286,7 +316,14 @@ export default function FeedbackUpload() {
             </div>
 
             {/* Submit Button at Bottom */}
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={handleDownloadPDF}
+                disabled={downloadingPDF}
+                className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition text-lg font-semibold"
+              >
+                {downloadingPDF ? 'Generating PDF...' : 'Download PDF'}
+              </button>
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
