@@ -76,7 +76,7 @@ export const generateConsolidatedPDF = (sheetData) => {
 
       doc.autoTable({
         startY: tableStartY,
-        margin: { left: 17, right: 12, bottom: 30 },
+        margin: { left: 20, right: 12, bottom: 30 },
         head: [[
           'Sr. No.',
           'Feedback No.',
@@ -104,7 +104,7 @@ export const generateConsolidatedPDF = (sheetData) => {
         alternateRowStyles: { fillColor: [248, 248, 248] },
         columnStyles: {
           0: { cellWidth: 12, halign: 'center' },
-          1: { cellWidth: 18, halign: 'center' },
+          1: { cellWidth: 20, halign: 'center' },
           2: { cellWidth: 14, halign: 'center' },
           3: { cellWidth: 20, halign: 'center' },
           4: { cellWidth: 22, halign: 'center' },
@@ -112,7 +112,7 @@ export const generateConsolidatedPDF = (sheetData) => {
           6: { cellWidth: 11, halign: 'center' },
           7: { cellWidth: 11, halign: 'center' },
           8: { cellWidth: 10, halign: 'center' },
-          9: { cellWidth: 30, halign: 'left' }
+          9: { cellWidth: 30, halign: 'center' }
         },
         didDrawCell: (data) => {
           // Highlight total row
@@ -126,7 +126,7 @@ export const generateConsolidatedPDF = (sheetData) => {
 
       // Summary section after table (compact)
       const finalY = (doc.lastAutoTable && doc.lastAutoTable.finalY) || (tableStartY + 8);
-      let y = finalY + 6;
+      let y = finalY + 9;
 
       const totalCount = sheet.feedbacks.length;
       const psiSum = sheet.feedbacks.reduce((sum, fb) => sum + (parseInt(fb.psi) || 0), 0);
