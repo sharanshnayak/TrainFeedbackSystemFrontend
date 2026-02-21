@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import FeedbackForm from './pages/FeedbackForm'
 import FeedbackFinder from './pages/FeedbackFinder'
 import FeedbackSuccess from './pages/FeedbackSuccess'
+import FeedbackUpload from './pages/FeedbackUpload'
 import Layout from './components/Layout'
 
 function App() {
@@ -29,6 +30,10 @@ function App() {
           <Route 
             path="/finder" 
             element={user ? <FeedbackFinder /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/upload" 
+            element={user ? (user.role === 'operator' ? <FeedbackUpload /> : <Navigate to="/finder" />) : <Navigate to="/login" />} 
           />
         </Route>
         

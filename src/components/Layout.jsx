@@ -25,16 +25,28 @@ const Layout = () => {
             {/* Navigation Links */}
             <div className="flex flex-wrap justify-center gap-2 md:gap-4">
               {user?.role === 'operator' && (
-                <Link
-                  to="/feedback"
-                  className={`px-3 md:px-4 py-2 rounded-md transition-colors text-sm md:text-base ${
-                    location.pathname === '/feedback'
-                      ? 'bg-blue-700'
-                      : 'hover:bg-blue-700'
-                  }`}
-                >
-                  New Feedback
-                </Link>
+                <>
+                  <Link
+                    to="/feedback"
+                    className={`px-3 md:px-4 py-2 rounded-md transition-colors text-sm md:text-base ${
+                      location.pathname === '/feedback'
+                        ? 'bg-blue-700'
+                        : 'hover:bg-blue-700'
+                    }`}
+                  >
+                    New Feedback
+                  </Link>
+                  <Link
+                    to="/upload"
+                    className={`px-3 md:px-4 py-2 rounded-md transition-colors text-sm md:text-base ${
+                      location.pathname === '/upload'
+                        ? 'bg-blue-700'
+                        : 'hover:bg-blue-700'
+                    }`}
+                  >
+                    Upload Feedbacks
+                  </Link>
+                </>
               )}
               <Link
                 to="/finder"
