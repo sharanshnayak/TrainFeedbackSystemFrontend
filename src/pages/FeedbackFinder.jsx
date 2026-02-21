@@ -205,117 +205,90 @@ const FeedbackFinder = () => {
     try {
       const doc = new jsPDF()
 
-    // Company Header (only company name on top)
-    doc.setFontSize(14)
-    doc.setTextColor(30, 64, 175)
-    doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, 12, { align: 'center' })
+      // Company Header (reduced size)
+      doc.setFontSize(11)
+      doc.setTextColor(30, 64, 175)
+      doc.setFont('helvetica', 'bold')
+      doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 15, 10)
 
-    // Line separator (moved closer)
-    doc.setDrawColor(200, 200, 200)
-    doc.line(20, 20, 190, 20)
+      doc.setFontSize(8)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(0, 0, 0)
+      doc.text('Regd. Off: 14/1, Nirode Behari Mullick Road, Kolkata - 700 006', 15, 15)
+      doc.text('Phone: 033-6535 8154 | E-mail: ybcolcs@yahoo.in', 15, 18.5)
 
-    // Header (moved up to reduce gap)
-    doc.setFontSize(20)
-    doc.setTextColor(30, 64, 175)
-    doc.text('Feedback Details', 105, 28, { align: 'center' })
+      const headerY = 25
 
-    // Feedback Number
-    doc.setFontSize(14)
-    doc.setTextColor(0, 0, 0)
-    doc.text(`Feedback #${feedback.feedbackNo}`, 105, 40, { align: 'center' })
+      // Train info header (compact)
+      doc.setFontSize(8)
+      doc.setFont('helvetica', 'bold')
+      doc.text(`Train No: ${feedback.trainNo}`, 15, headerY)
+      doc.text(`Train Name: ${feedback.trainName}`, 100, headerY, { align: 'center' })
+      
+      // Format date as dd/mm/yyyy
+      const formatDateStr = (dateStr) => {
+        const d = new Date(dateStr)
+        const day = String(d.getDate()).padStart(2, '0')
+        const month = String(d.getMonth() + 1).padStart(2, '0')
+        const year = d.getFullYear()
+        return `${day}/${month}/${year}`
+      }
+      doc.text(`Report Date: ${formatDateStr(feedback.reportDate)}`, 185, headerY, { align: 'right' })
 
-    // Line separator (below header)
-    doc.setDrawColor(200, 200, 200)
-    doc.line(20, 46, 190, 46)
+      // Separator line
+      doc.setDrawColor(200, 200, 200)
+      doc.line(15, 22, 195, 22)
 
-    let yPos = 54
+      let yPos = 30
 
-    // Train Information
-    doc.setFontSize(12)
-    doc.setFont('helvetica', 'bold')
-    doc.text('Train Information', 20, yPos)
-    yPos += 8
-    
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(10)
-    doc.text(`Train No: ${feedback.trainNo}`, 20, yPos)
-    doc.text(`Date: ${new Date(feedback.reportDate).toLocaleDateString()}`, 110, yPos)
-    yPos += 6
-    doc.text(`Train Name: ${feedback.trainName}`, 20, yPos)
-    yPos += 6
-    // From/To stations removed from data model
-    yPos += 6
-    doc.text(`Coach: ${feedback.coachNo}`, 20, yPos)
-    yPos += 10
+      // Summary Details Section
+      doc.setFontSize(8)
+      doc.setFont('helvetica', 'bold')
+      doc.text('Feedback Details', 15, yPos)
+      yPos += 5
 
-    // Contact Information
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(12)
-    doc.text('Contact Information', 20, yPos)
-    yPos += 8
-    
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(10)
-    doc.text(`PNR: ${feedback.pnr}`, 20, yPos)
-    doc.text(`Mobile: ${feedback.mobile}`, 110, yPos)
-    yPos += 10
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(7)
 
-    // Technical Data
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(12)
-    doc.text('Technical Data', 20, yPos)
-    yPos += 8
-    
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(10)
-    doc.text(`NS-1: ${feedback.ns1 || 0}`, 20, yPos)
-    doc.text(`NS-2: ${feedback.ns2 || 0}`, 70, yPos)
-    doc.text(`NS-3: ${feedback.ns3 || 0}`, 120, yPos)
-    yPos += 6
-    doc.text(`PSI: ${feedback.psi || 'N/A'}`, 20, yPos)
-    yPos += 6
-    if (feedback.feedbackRating) {
-      doc.text(`Rating/Status: ${feedback.feedbackRating}`, 20, yPos)
-      yPos += 6
+      // Two column layout
+      const col1X = 15
+      const col2X = 105
+      const lineHeight = 4
+
+      doc.text(`Feedback No: ${feedback.feedbackNo}`, col1X, yPos)
+      doc.text(`Coach: ${feedback.coachNo}`, col2X, yPos)
+      yPos += lineHeight
+
+      doc.text(`PNR: ${feedback.pnr}`, col1X, yPos)
+      doc.text(`Mobile: ${feedback.mobile}`, col2X, yPos)
+      yPos += lineHeight
+
+      doc.text(`NS-1: ${feedback.ns1 || 0}`, col1X, yPos)
+      doc.text(`NS-2: ${feedback.ns2 || 0}`, col2X, yPos)
+      yPos += lineHeight
+
+      doc.text(`NS-3: ${feedback.ns3 || 0}`, col1X, yPos)
+      doc.text(`PSI: ${feedback.psi || 'N/A'}`, col2X, yPos)
+      yPos += lineHeight
+
+      if (feedback.feedbackRating) {
+        doc.text(`Rating: ${feedback.feedbackRating}`, col1X, yPos)
+        yPos += lineHeight
+      }
+
+      yPos += 3
+
+      // Feedback Content
+      if (feedback.feedbackText) {
+        doc.setFont('helvetica', 'bold')
+        doc.text('Feedback Comments:', 15, yPos)
+        yPos += 4
+        
+        doc.setFont('helvetica', 'normal')
+        const textLines = doc.splitTextToSize(feedback.feedbackText, 180)
+        doc.text(textLines, 15, yPos)
+        yPos += (textLines.length * 3.5)
     }
-    doc.text(`Report Date: ${new Date(feedback.reportDate).toLocaleDateString()}`, 20, yPos)
-    yPos += 10
-
-    // Feedback Content
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(12)
-    doc.text('Feedback', 20, yPos)
-    yPos += 8
-
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(10)
-    
-    // If both exist, show only text; otherwise show whatever is available
-    if (feedback.feedbackText) {
-      const textLines = doc.splitTextToSize(feedback.feedbackText, 170)
-      doc.text(textLines, 20, yPos)
-      yPos += (textLines.length * 6)
-    } else if (feedback.feedbackRating) {
-      doc.text(feedback.feedbackRating.toUpperCase(), 20, yPos)
-      yPos += 6
-    }
-
-    // Footer
-    doc.setFontSize(8)
-    doc.setTextColor(100, 100, 100)
-    doc.line(20, doc.internal.pageSize.height - 20, 190, doc.internal.pageSize.height - 20)
-    doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 105, doc.internal.pageSize.height - 16, { align: 'center' })
-    doc.text('Regd. Off: 14/1, Nirode Behari Mullick Road, Kolkata - 700 006', 105, doc.internal.pageSize.height - 12, { align: 'center' })
-    doc.text('Phone: 033-6535 8154 | E-mail: ybcolcs@yahoo.in', 105, doc.internal.pageSize.height - 8, { align: 'center' })
-    
-    // Page number
-    doc.setTextColor(150, 150, 150)
-    doc.text(
-      `Page 1 of 1`,
-      105,
-      doc.internal.pageSize.height - 4,
-      { align: 'center' }
-    )
 
     doc.save(`feedback_${feedback.feedbackNo}_${feedback.trainNo}.pdf`)
     toast.success('PDF downloaded successfully!')
@@ -340,11 +313,6 @@ const FeedbackFinder = () => {
     try {
       // Prepare data for submission
       const dataToSubmit = { ...editForm }
-      
-      // If no feedback text but rating exists, store rating in feedbackText field
-      if (!dataToSubmit.feedbackText && dataToSubmit.feedbackRating) {
-        dataToSubmit.feedbackText = dataToSubmit.feedbackRating
-      }
       
       // Set default values for ns1, ns2, ns3 if empty
       if (!dataToSubmit.ns1 || dataToSubmit.ns1 === '') dataToSubmit.ns1 = 0
