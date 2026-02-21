@@ -81,7 +81,7 @@ const FeedbackFinder = () => {
       const headerY = 25
 
       // Train info header (compact)
-      doc.setFontSize(8)
+      doc.setFontSize(9)
       doc.setFont('helvetica', 'bold')
       doc.text(`Train No: ${trainNo}`, 15, headerY)
       doc.text(`Train Name: ${feedbacks[0]?.trainName || ''}`, 100, headerY, { align: 'center' })
@@ -141,16 +141,16 @@ const FeedbackFinder = () => {
           fillColor: [30, 64, 175],
           textColor: 255,
           fontStyle: 'bold',
-          fontSize: 7,
+          fontSize: 9,
           valign: 'middle',
           halign: 'center',
           cellPadding: 2
         },
-        bodyStyles: { fontSize: 6.5, valign: 'middle', halign: 'center', cellPadding: 1.5, lineColor: 200 },
+        bodyStyles: { fontSize: 8.5, valign: 'middle', halign: 'center', cellPadding: 1.5, lineColor: 200 },
         alternateRowStyles: { fillColor: [248, 248, 248] },
         columnStyles: {
-          0: { cellWidth: 12, halign: 'center' },
-          1: { cellWidth: 20, halign: 'center' },
+          0: { cellWidth: 14, halign: 'center' },
+          1: { cellWidth: 22, halign: 'center' },
           2: { cellWidth: 14, halign: 'center' },
           3: { cellWidth: 20, halign: 'center' },
           4: { cellWidth: 22, halign: 'center' },
@@ -164,8 +164,9 @@ const FeedbackFinder = () => {
           // Highlight total row
           if (data.row.index === feedbacks.length) {
             data.cell.styles.fontStyle = 'bold'
-            data.cell.styles.fillColor = [200, 200, 200]
-            data.cell.styles.fontSize = 7
+            data.cell.styles.fillColor = [80, 80, 80]
+            data.cell.styles.textColor = [255, 255, 255]
+            data.cell.styles.fontSize = 11
           }
         }
       })

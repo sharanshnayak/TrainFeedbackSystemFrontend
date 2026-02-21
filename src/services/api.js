@@ -41,3 +41,8 @@ api.interceptors.response.use(
 )
 
 export default api
+
+export const authAPI = {
+  changePassword: (oldPassword, newPassword, confirmPassword) =>
+    api.put('/auth/change-password', { oldPassword, newPassword, confirmPassword })
+}

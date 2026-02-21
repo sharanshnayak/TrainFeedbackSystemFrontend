@@ -1,9 +1,12 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import ChangePasswordModal from './ChangePasswordModal'
 
 const Layout = () => {
   const { user, logout } = useAuth()
   const location = useLocation()
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -66,6 +69,12 @@ const Layout = () => {
                 Welcome, <span className="font-semibold">{user?.name}</span> ({user?.role})
               </span>
               <button
+                onClick={() => setIsPasswordModalOpen(true)}
+                className="px-3 md:px-4 py-2 bg-yellow-500 hover:bg-yellow-600 rounded-md transition-colors text-sm md:text-base"
+              >
+                Change Password
+              </button>
+              <button
                 onClick={logout}
                 className="px-3 md:px-4 py-2 bg-red-500 hover:bg-red-600 rounded-md transition-colors text-sm md:text-base"
               >
@@ -120,7 +129,11 @@ const Layout = () => {
           </div>
         </div>
       </footer>
-    </div>
+      {/* Change Password Modal */}
+      <ChangePasswordModal 
+        isOpen={isPasswordModalOpen} 
+        onClose={() => setIsPasswordModalOpen(false)} 
+      />    </div>
   )
 }
 
