@@ -161,8 +161,17 @@ const FeedbackFinder = () => {
           9: { cellWidth: 30, halign: 'center' }
         },
         didDrawCell: (data) => {
-          // Highlight total row
-          if (data.row.index === feedbacks.length) {
+          // Track which rows are total rows - detect by 'Total' text in first column
+          if (!doc.totalRowIndices) {
+            doc.totalRowIndices = new Set();
+          }
+          
+          if (data.column.index === 0 && data.cell.text[0] === 'Total') {
+            doc.totalRowIndices.add(data.row.index);
+          }
+          
+          // Bold ALL cells in total rows
+          if (doc.totalRowIndices.has(data.row.index)) {
             data.cell.styles.fontStyle = 'bold'
             data.cell.styles.fillColor = [80, 80, 80]
             data.cell.styles.textColor = [255, 255, 255]

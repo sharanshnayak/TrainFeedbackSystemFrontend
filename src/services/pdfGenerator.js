@@ -101,7 +101,7 @@ export const generateConsolidatedPDF = (sheetData) => {
         alternateRowStyles: { fillColor: [248, 248, 248] },
         columnStyles: {
           0: { cellWidth: 14, halign: 'center' },
-          1: { cellWidth: 22, halign: 'center' },
+          1: { cellWidth: 24, halign: 'center' },
           2: { cellWidth: 14, halign: 'center' },
           3: { cellWidth: 20, halign: 'center' },
           4: { cellWidth: 22, halign: 'center' },
@@ -112,8 +112,17 @@ export const generateConsolidatedPDF = (sheetData) => {
           9: { cellWidth: 30, halign: 'center' }
         },
         didDrawCell: (data) => {
-          // Highlight total row
-          if (data.row.index === sheet.feedbacks.length) {
+          // Track which rows are total rows - detect by 'Total' text in first column
+          if (!doc.totalRowIndices) {
+            doc.totalRowIndices = new Set();
+          }
+          
+          if (data.column.index === 0 && data.cell.text[0] === 'Total') {
+            doc.totalRowIndices.add(data.row.index);
+          }
+          
+          // Bold ALL cells in total rows
+          if (doc.totalRowIndices.has(data.row.index)) {
             data.cell.styles.fontStyle = 'bold';
             data.cell.styles.fillColor = [80, 80, 80];
             data.cell.styles.textColor = [255, 255, 255];
