@@ -114,10 +114,10 @@ export const generateConsolidatedPDF = (sheetData) => {
         },
         foot: footerRow,
         footStyles: {
-          fillColor: [80, 80, 80],
-          textColor: [255, 255, 255],
+          fillColor: [248, 248, 248],
+          textColor: [0, 0, 0],
           fontStyle: 'bold',
-          fontSize: 11,
+          fontSize: 8,
           halign: 'center',
           valign: 'middle',
           cellPadding: 2
