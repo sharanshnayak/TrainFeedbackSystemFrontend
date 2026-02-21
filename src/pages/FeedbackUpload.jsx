@@ -1,10 +1,8 @@
-import React, { useState, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { useState } from 'react';
 import api from '../services/api';
 import Layout from '../components/Layout';
 
 export default function FeedbackUpload() {
-  const { user } = useContext(AuthContext);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploadedFeedbacks, setUploadedFeedbacks] = useState([]);
