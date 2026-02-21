@@ -60,7 +60,7 @@ export const generateConsolidatedPDF = (sheetData) => {
         fb.ns2 ?? '',
         fb.ns3 ?? '',
         fb.psi ?? '',
-        fb.feedbackStatus ?? 'NA'
+        fb.feedbackRating ?? 'NA'
       ]);
 
       // Add totals row
