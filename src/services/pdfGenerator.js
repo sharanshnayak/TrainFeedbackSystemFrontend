@@ -63,7 +63,7 @@ export const generateConsolidatedPDF = (sheetData) => {
         fb.ns2 ?? '',
         fb.ns3 ?? '',
         fb.psi ?? '',
-        fb.feedbackRating ? String(fb.feedbackRating).toUpperCase() : (fb.feedbackText ? 'TEXT' : '')
+        fb.feedbackStatus ?? 'NA'
       ]);
 
       // Add totals row
