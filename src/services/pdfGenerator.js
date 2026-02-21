@@ -69,11 +69,12 @@ export const generateConsolidatedPDF = (sheetData) => {
       const totalNS3 = sheet.feedbacks.reduce((sum, fb) => sum + (parseInt(fb.ns3) || 0), 0);
       const totalPSI = sheet.feedbacks.reduce((sum, fb) => sum + (parseInt(fb.psi) || 0), 0);
 
-      body.push(['Total', '', '', '', '', totalNS1, totalNS2, totalNS3, totalPSI, '']);
+      // Create footer row for totals
+      const footerRow = [['Total', '', '', '', '', totalNS1, totalNS2, totalNS3, totalPSI, '']];
 
       doc.autoTable({
         startY: tableStartY,
-        margin: { left: 20, right: 12, bottom: 30 },
+        margin: { left: 17, right: 12, bottom: 30 },
         head: [[
           'Sr. No.',
           'Feedback No.',
@@ -101,7 +102,7 @@ export const generateConsolidatedPDF = (sheetData) => {
         alternateRowStyles: { fillColor: [248, 248, 248] },
         columnStyles: {
           0: { cellWidth: 14, halign: 'center' },
-          1: { cellWidth: 24, halign: 'center' },
+          1: { cellWidth: 25, halign: 'center' },
           2: { cellWidth: 14, halign: 'center' },
           3: { cellWidth: 20, halign: 'center' },
           4: { cellWidth: 22, halign: 'center' },
@@ -111,23 +112,15 @@ export const generateConsolidatedPDF = (sheetData) => {
           8: { cellWidth: 10, halign: 'center' },
           9: { cellWidth: 30, halign: 'center' }
         },
-        didDrawCell: (data) => {
-          // Track which rows are total rows - detect by 'Total' text in first column
-          if (!doc.totalRowIndices) {
-            doc.totalRowIndices = new Set();
-          }
-          
-          if (data.column.index === 0 && data.cell.text[0] === 'Total') {
-            doc.totalRowIndices.add(data.row.index);
-          }
-          
-          // Bold ALL cells in total rows
-          if (doc.totalRowIndices.has(data.row.index)) {
-            data.cell.styles.fontStyle = 'bold';
-            data.cell.styles.fillColor = [80, 80, 80];
-            data.cell.styles.textColor = [255, 255, 255];
-            data.cell.styles.fontSize = 11;
-          }
+        foot: footerRow,
+        footStyles: {
+          fillColor: [80, 80, 80],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 11,
+          halign: 'center',
+          valign: 'middle',
+          cellPadding: 2
         }
       });
 
