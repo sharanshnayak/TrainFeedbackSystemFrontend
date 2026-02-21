@@ -136,16 +136,16 @@ export const generateConsolidatedPDF = (sheetData) => {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(8);
 
-      doc.text('Total Feedbacks:', 10, y);
-      doc.text(totalCount.toString(), 80, y);
+      doc.text('Total Feedbacks:', 25, y);
+      doc.text(totalCount.toString(), 85, y);
       y += 5;
 
-      doc.text('Total No Percentage of PSI for the Rake:', 10, y);
-      doc.text(`${percentagePSI}%`, 80, y);
+      doc.text('Total No Percentage of PSI for the Rake:', 25, y);
+      doc.text(`${percentagePSI}%`, 85, y);
       y += 5;
 
-      doc.text('Average PSI of Rake for the Round Trip:', 10, y);
-      doc.text(averagePSI, 80, y);
+      doc.text('Average PSI of Rake for the Round Trip:', 25, y);
+      doc.text(averagePSI, 85, y);
 
       isFirstPage = false;
     });
