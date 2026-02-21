@@ -133,7 +133,7 @@ const FeedbackFinder = () => {
           'NS-2',
           'NS-3',
           'PSI',
-          'Feedback Rating/Status'
+          'Feedback Status'
         ]],
         body,
         theme: 'striped',
