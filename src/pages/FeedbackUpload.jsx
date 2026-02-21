@@ -320,17 +320,21 @@ export default function FeedbackUpload() {
                       <label className="text-sm text-gray-600">PSI</label>
                       <p className="font-semibold">{feedback.psi}</p>
                     </div>
-                    <div>
-                      <label className="text-sm text-gray-600">Feedback Status</label>
-                      <p className={`font-semibold text-sm px-2 py-1 rounded text-center ${
-                        feedback.feedbackStatus === 'Excellent' ? 'bg-green-100 text-green-800' :
-                        feedback.feedbackStatus === 'Very Good' ? 'bg-blue-100 text-blue-800' :
-                        feedback.feedbackStatus === 'Good' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-orange-100 text-orange-800'
-                      }`}>
-                        {feedback.feedbackStatus || 'NA'}
-                      </p>
-                    </div>
+                    {feedback.feedbackRating && (
+                      <div>
+                        <label className="text-sm text-gray-600">Feedback Rating/Status</label>
+                        <p className={`font-semibold text-sm px-2 py-1 rounded text-center ${
+                          feedback.feedbackRating === 'Excellent' ? 'bg-green-100 text-green-800' :
+                          feedback.feedbackRating === 'Very Good' ? 'bg-blue-100 text-blue-800' :
+                          feedback.feedbackRating === 'Good' ? 'bg-yellow-100 text-yellow-800' :
+                          feedback.feedbackRating === 'Average' ? 'bg-orange-100 text-orange-800' :
+                          feedback.feedbackRating === 'Poor' ? 'bg-red-100 text-red-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {feedback.feedbackRating}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Validation Errors */}

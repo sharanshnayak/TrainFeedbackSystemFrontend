@@ -66,40 +66,38 @@ const FeedbackFinder = () => {
 
       const doc = new jsPDF()
 
-      // Company Header block
-      doc.setFontSize(14)
+      // Company Header (reduced size)
+      doc.setFontSize(11)
       doc.setTextColor(30, 64, 175)
       doc.setFont('helvetica', 'bold')
-      doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 20, 14)
+      doc.text('Young Bengal Co-Operative Labour Contract Society Ltd.', 15, 10)
 
-      doc.setFontSize(10)
+      doc.setFontSize(8)
       doc.setFont('helvetica', 'normal')
       doc.setTextColor(0, 0, 0)
-      doc.text('Regd. Off: 14/1, Nirode Behari Mullick Road, Kolkata - 700 006', 20, 20)
-      doc.text('Phone: 033-6535 8154 | E-mail: ybcolcs@yahoo.in', 20, 26)
+      doc.text('Regd. Off: 14/1, Nirode Behari Mullick Road, Kolkata - 700 006', 15, 15)
+      doc.text('Phone: 033-6535 8154 | E-mail: ybcolcs@yahoo.in', 15, 18.5)
 
-      // Small gap
-      const headerY = 36
+      const headerY = 25
 
-      // Helper function to format date as dd/mm/yyyy
-      const formatDate = (dateStr) => {
-        const d = new Date(dateStr)
+      // Train info header (compact)
+      doc.setFontSize(8)
+      doc.setFont('helvetica', 'bold')
+      doc.text(`Train No: ${trainNo}`, 15, headerY)
+      doc.text(`Train Name: ${feedbacks[0]?.trainName || ''}`, 100, headerY, { align: 'center' })
+      
+      // Format date as dd/mm/yyyy
+      const formatDateStr = () => {
+        const d = new Date(date)
         const day = String(d.getDate()).padStart(2, '0')
         const month = String(d.getMonth() + 1).padStart(2, '0')
         const year = d.getFullYear()
         return `${day}/${month}/${year}`
       }
-
-      // Single-row header: Train No (left), Train Name (center), Report Date (right)
-      doc.setFontSize(9)
-      doc.setFont('helvetica', 'bold')
-      const trainNameForHeader = feedbacks[0]?.trainName || ''
-      doc.text(`Train No: ${trainNo}`, 20, headerY)
-      doc.text(`Train Name: ${trainNameForHeader}`, 105, headerY, { align: 'center' })
-      doc.text(`Report Date: ${formatDate(date)}`, 190, headerY, { align: 'right' })
+      doc.text(`Report Date: ${formatDateStr()}`, 185, headerY, { align: 'right' })
 
       // Table start
-      const tableStartY = headerY + 10
+      const tableStartY = headerY + 4
 
       const body = feedbacks.map((fb, idx) => [
         idx + 1,
@@ -111,65 +109,89 @@ const FeedbackFinder = () => {
         fb.ns2 ?? '',
         fb.ns3 ?? '',
         fb.psi ?? '',
-        fb.feedbackRating ? String(fb.feedbackRating).toUpperCase() : (fb.feedbackText ? 'TEXT' : '')
+        fb.feedbackRating ?? ''
       ])
+
+      // Add totals row
+      const totalNS1 = feedbacks.reduce((sum, fb) => sum + (parseInt(fb.ns1) || 0), 0)
+      const totalNS2 = feedbacks.reduce((sum, fb) => sum + (parseInt(fb.ns2) || 0), 0)
+      const totalNS3 = feedbacks.reduce((sum, fb) => sum + (parseInt(fb.ns3) || 0), 0)
+      const totalPSI = feedbacks.reduce((sum, fb) => sum + (parseInt(fb.psi) || 0), 0)
+
+      body.push(['Total', '', '', '', '', totalNS1, totalNS2, totalNS3, totalPSI, ''])
 
       doc.autoTable({
         startY: tableStartY,
-        margin: { left: 10, right: 10 },
+        margin: { left: 20, right: 12, bottom: 30 },
         head: [[
           'Sr. No.',
           'Feedback No.',
           'Coach',
           'PNR',
-          'Mobile No.',
+          'Mobile',
           'NS-1',
           'NS-2',
           'NS-3',
           'PSI',
-          'FEEDBACK STATUS'
+          'Feedback Rating/Status'
         ]],
         body,
         theme: 'striped',
-        headStyles: { fillColor: [30, 64, 175], textColor: 255, fontStyle: 'bold', fontSize: 9, valign: 'middle'},
-        styles: { fontSize: 9, valign: 'middle', minCellHeight: 12 },
+        headStyles: {
+          fillColor: [30, 64, 175],
+          textColor: 255,
+          fontStyle: 'bold',
+          fontSize: 7,
+          valign: 'middle',
+          halign: 'center',
+          cellPadding: 2
+        },
+        bodyStyles: { fontSize: 6.5, valign: 'middle', halign: 'center', cellPadding: 1.5, lineColor: 200 },
+        alternateRowStyles: { fillColor: [248, 248, 248] },
         columnStyles: {
-          0: { cellWidth: 15, fontSize: 8 },
-          1: { cellWidth: 25, fontSize: 9 },
-          2: { cellWidth: 15, fontSize: 9 },
-          3: { cellWidth: 25, fontSize: 9 },
-          4: { cellWidth: 25, fontSize: 9 },
-          5: { cellWidth: 12, fontSize: 8 },
-          6: { cellWidth: 12, fontSize: 8 },
-          7: { cellWidth: 12, fontSize: 8 },
-          8: { cellWidth: 10, fontSize: 8 },
-          9: { cellWidth: 40, fontSize: 9 }
+          0: { cellWidth: 12, halign: 'center' },
+          1: { cellWidth: 20, halign: 'center' },
+          2: { cellWidth: 14, halign: 'center' },
+          3: { cellWidth: 20, halign: 'center' },
+          4: { cellWidth: 22, halign: 'center' },
+          5: { cellWidth: 11, halign: 'center' },
+          6: { cellWidth: 11, halign: 'center' },
+          7: { cellWidth: 11, halign: 'center' },
+          8: { cellWidth: 10, halign: 'center' },
+          9: { cellWidth: 30, halign: 'center' }
+        },
+        didDrawCell: (data) => {
+          // Highlight total row
+          if (data.row.index === feedbacks.length) {
+            data.cell.styles.fontStyle = 'bold'
+            data.cell.styles.fillColor = [200, 200, 200]
+            data.cell.styles.fontSize = 7
+          }
         }
       })
 
-      // After table: three label rows with values
+      // Summary section after table (compact)
       const finalY = (doc.lastAutoTable && doc.lastAutoTable.finalY) || (tableStartY + 8)
-      let y = finalY + 8
-      
-      // Calculate metrics
+      let y = finalY + 9
+
       const totalCount = feedbacks.length
       const psiSum = feedbacks.reduce((sum, fb) => sum + (parseInt(fb.psi) || 0), 0)
-      const percentageAtPSI = totalCount > 0 ? ((psiSum / totalCount)).toFixed(2) : '0'
-      const averagePSI = totalCount > 0 ? (psiSum).toFixed(2) : '0'
-      
+      const percentagePSI = totalCount > 0 ? ((psiSum / totalCount)).toFixed(2) : '0'
+      const averagePSI = totalCount > 0 ? psiSum.toFixed(2) : '0'
+
       doc.setFont('helvetica', 'bold')
-      doc.setFontSize(10)
-      doc.text('Total feedbacks', 10, y)
-      doc.text(totalCount.toString(), 120, y)
-      y += 8
-      doc.text('Total No percentage of PSI for the Rake', 10, y)
-      doc.text(`${percentageAtPSI}%`, 120, y)
-      y += 8
-      doc.text('Average PSI of Rake for the round trip', 10, y)
-      doc.text(averagePSI, 120, y)
+      doc.setFontSize(8)
 
-      // Footer on each page
+      doc.text('Total Feedbacks:', 25, y)
+      doc.text(totalCount.toString(), 85, y)
+      y += 5
 
+      doc.text('Total No Percentage of PSI for the Rake:', 25, y)
+      doc.text(`${percentagePSI}%`, 85, y)
+      y += 5
+
+      doc.text('Average PSI of Rake for the Round Trip:', 25, y)
+      doc.text(averagePSI, 85, y)
 
       doc.save(`feedbacks_${trainNo}_${new Date(date).toISOString().split('T')[0]}.pdf`)
       toast.success('PDF exported successfully!')
@@ -217,7 +239,7 @@ const FeedbackFinder = () => {
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(10)
     doc.text(`Train No: ${feedback.trainNo}`, 20, yPos)
-    doc.text(`Date: ${new Date(feedback.date).toLocaleDateString()}`, 110, yPos)
+    doc.text(`Date: ${new Date(feedback.reportDate).toLocaleDateString()}`, 110, yPos)
     yPos += 6
     doc.text(`Train Name: ${feedback.trainName}`, 20, yPos)
     yPos += 6
@@ -252,32 +274,12 @@ const FeedbackFinder = () => {
     yPos += 6
     doc.text(`PSI: ${feedback.psi || 'N/A'}`, 20, yPos)
     yPos += 6
+    if (feedback.feedbackRating) {
+      doc.text(`Rating/Status: ${feedback.feedbackRating}`, 20, yPos)
+      yPos += 6
+    }
     doc.text(`Report Date: ${new Date(feedback.reportDate).toLocaleDateString()}`, 20, yPos)
     yPos += 10
-
-    // Additional Metrics
-    if (feedback.totalFeedbacks || feedback.totalPercentageAtPSI || feedback.averagePSIRoundTrip) {
-      doc.setFont('helvetica', 'bold')
-      doc.setFontSize(12)
-      doc.text('Additional Metrics', 20, yPos)
-      yPos += 8
-      
-      doc.setFont('helvetica', 'normal')
-      doc.setFontSize(10)
-      if (feedback.totalFeedbacks) {
-        doc.text(`Total Feedbacks: ${feedback.totalFeedbacks}`, 20, yPos)
-        yPos += 6
-      }
-      if (feedback.totalPercentageAtPSI) {
-        doc.text(`Total % at PSI: ${feedback.totalPercentageAtPSI}%`, 20, yPos)
-        yPos += 6
-      }
-      if (feedback.averagePSIRoundTrip) {
-        doc.text(`Avg PSI Round Trip: ${feedback.averagePSIRoundTrip}`, 20, yPos)
-        yPos += 6
-      }
-      yPos += 4
-    }
 
     // Feedback Content
     doc.setFont('helvetica', 'bold')
@@ -530,11 +532,13 @@ const FeedbackFinder = () => {
                                 {feedback.feedbackText.substring(0, 40)}...
                               </div>
                             ) : feedback.feedbackRating ? (
-                              <span className={`px-2 py-1 rounded text-xs font-medium capitalize inline-block ${
-                                feedback.feedbackRating === 'excellent' ? 'bg-green-100 text-green-800' :
-                                feedback.feedbackRating === 'very good' ? 'bg-blue-100 text-blue-800' :
-                                feedback.feedbackRating === 'good' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-red-100 text-red-800'
+                              <span className={`px-2 py-1 rounded text-xs font-medium inline-block ${
+                                feedback.feedbackRating === 'Excellent' ? 'bg-green-100 text-green-800' :
+                                feedback.feedbackRating === 'Very Good' ? 'bg-blue-100 text-blue-800' :
+                                feedback.feedbackRating === 'Good' ? 'bg-yellow-100 text-yellow-800' :
+                                feedback.feedbackRating === 'Average' ? 'bg-orange-100 text-orange-800' :
+                                feedback.feedbackRating === 'Poor' ? 'bg-red-100 text-red-800' :
+                                'bg-gray-100 text-gray-800'
                               }`}>
                                 {feedback.feedbackRating}
                               </span>
@@ -648,13 +652,15 @@ const FeedbackFinder = () => {
                           {feedback.feedbackText ? (
                             <p className="text-gray-800 bg-white p-3 rounded border">{feedback.feedbackText}</p>
                           ) : (
-                            <span className={`px-3 py-1 rounded font-medium capitalize inline-block ${
-                              feedback.feedbackRating === 'excellent' ? 'bg-green-100 text-green-800' :
-                              feedback.feedbackRating === 'very good' ? 'bg-blue-100 text-blue-800' :
-                              feedback.feedbackRating === 'good' ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-red-100 text-red-800'
+                            <span className={`px-3 py-1 rounded font-medium inline-block ${
+                              feedback.feedbackRating === 'Excellent' ? 'bg-green-100 text-green-800' :
+                              feedback.feedbackRating === 'Very Good' ? 'bg-blue-100 text-blue-800' :
+                              feedback.feedbackRating === 'Good' ? 'bg-yellow-100 text-yellow-800' :
+                              feedback.feedbackRating === 'Average' ? 'bg-orange-100 text-orange-800' :
+                              feedback.feedbackRating === 'Poor' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
                             }`}>
-                              {feedback.feedbackRating.toUpperCase()}
+                              {feedback.feedbackRating}
                             </span>
                           )}
                         </div>
@@ -803,7 +809,7 @@ const FeedbackFinder = () => {
                 <div className="mb-6">
                   <label className="label">Feedback Rating (Required if no text provided) *</label>
                   <div className="flex gap-4 flex-wrap">
-                    {['poor', 'average', 'good', 'very good', 'excellent'].map((rating) => (
+                    {['Poor', 'Average', 'Good', 'Very Good', 'Excellent'].map((rating) => (
                       <label key={rating} className="flex items-center space-x-2 cursor-pointer">
                         <input
                           type="radio"

@@ -108,30 +108,6 @@ const FeedbackSuccess = () => {
     doc.text(`Report Date: ${new Date(feedback.reportDate).toLocaleDateString()}`, 20, yPos)
     yPos += 10
 
-    // Additional Metrics
-    if (feedback.totalFeedbacks || feedback.totalPercentageAtPSI || feedback.averagePSIRoundTrip) {
-      doc.setFont('helvetica', 'bold')
-      doc.setFontSize(12)
-      doc.text('Additional Metrics', 20, yPos)
-      yPos += 8
-      
-      doc.setFont('helvetica', 'normal')
-      doc.setFontSize(10)
-      if (feedback.totalFeedbacks) {
-        doc.text(`Total Feedbacks: ${feedback.totalFeedbacks}`, 20, yPos)
-        yPos += 6
-      }
-      if (feedback.totalPercentageAtPSI) {
-        doc.text(`Total % at PSI: ${feedback.totalPercentageAtPSI}%`, 20, yPos)
-        yPos += 6
-      }
-      if (feedback.averagePSIRoundTrip) {
-        doc.text(`Avg PSI Round Trip: ${feedback.averagePSIRoundTrip}`, 20, yPos)
-        yPos += 6
-      }
-      yPos += 4
-    }
-
     // Feedback Content
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(12)

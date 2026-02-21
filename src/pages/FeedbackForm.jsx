@@ -10,7 +10,6 @@ const FeedbackForm = () => {
 
   const [formData, setFormData] = useState({
     feedbackNo: '',
-    date: '',
     trainNo: '',
     trainName: '',
     coachNo: '',
@@ -22,10 +21,7 @@ const FeedbackForm = () => {
     psi: '',
     reportDate: '',
     feedbackText: '',
-    feedbackRating: '',
-    totalFeedbacks: '',
-    totalPercentageAtPSI: '',
-    averagePSIRoundTrip: ''
+    feedbackRating: ''
   })
 
   const handleChange = (e) => {
@@ -35,7 +31,7 @@ const FeedbackForm = () => {
 
   const validateForm = () => {
     const required = [
-      'feedbackNo', 'date', 'trainNo', 'trainName', 'coachNo',
+      'feedbackNo', 'trainNo', 'trainName', 'coachNo',
       'pnr', 'mobile', 'psi', 'reportDate'
     ]
 
@@ -112,18 +108,6 @@ const FeedbackForm = () => {
                 onChange={handleChange}
                 className="input-field"
                 placeholder="Enter feedback number"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="label">Date *</label>
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                className="input-field"
                 required
               />
             </div>
@@ -243,7 +227,7 @@ const FeedbackForm = () => {
             <div>
               <label className="label">Feedback Rating (Required if no text provided) *</label>
               <div className="flex gap-4 flex-wrap">
-                {['poor', 'average', 'good', 'very good', 'excellent'].map((rating) => (
+                {['Poor', 'Average', 'Good', 'Very Good', 'Excellent'].map((rating) => (
                   <label key={rating} className="flex items-center space-x-2 cursor-pointer">
                     <input type="radio" name="feedbackRating" value={rating} checked={formData.feedbackRating === rating} onChange={handleChange} className="w-4 h-4" />
                     <span className="capitalize">{rating}</span>
@@ -252,23 +236,6 @@ const FeedbackForm = () => {
               </div>
             </div>
           )}
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="label">Total No. of Feedbacks</label>
-              <input type="number" name="totalFeedbacks" value={formData.totalFeedbacks} onChange={handleChange} className="input-field" placeholder="0" min="0" />
-            </div>
-
-            <div>
-              <label className="label">Total % at PSI for Rake</label>
-              <input type="number" name="totalPercentageAtPSI" value={formData.totalPercentageAtPSI} onChange={handleChange} className="input-field" placeholder="0" min="0" max="100" step="0.01" />
-            </div>
-
-            <div>
-              <label className="label">Average PSI at Rake (Round Trip)</label>
-              <input type="number" name="averagePSIRoundTrip" value={formData.averagePSIRoundTrip} onChange={handleChange} className="input-field" placeholder="0" min="0" step="0.01" />
-            </div>
-          </div>
 
           <div className="flex justify-center pt-4">
             <button type="submit" className="btn-primary px-12 py-3 text-lg" disabled={loading}>Submit Feedback</button>
