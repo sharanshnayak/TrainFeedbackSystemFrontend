@@ -41,7 +41,7 @@ export const generateConsolidatedPDF = (sheetData) => {
       const headerY = 25;
 
       // Train info header (compact)
-      doc.setFontSize(8);
+      doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
       doc.text(`Train No: ${sheet.trainNo}`, 15, headerY);
       doc.text(`Train Name: ${sheet.trainName}`, 100, headerY, { align: 'center' });
@@ -92,12 +92,12 @@ export const generateConsolidatedPDF = (sheetData) => {
           fillColor: [30, 64, 175],
           textColor: 255,
           fontStyle: 'bold',
-          fontSize: 7,
+          fontSize: 9,
           valign: 'middle',
           halign: 'center',
           cellPadding: 2
         },
-        bodyStyles: { fontSize: 6.5, valign: 'middle', halign: 'center', cellPadding: 1.5, lineColor: 200 },
+        bodyStyles: { fontSize: 8.5, valign: 'middle', halign: 'center', cellPadding: 1.5, lineColor: 200 },
         alternateRowStyles: { fillColor: [248, 248, 248] },
         columnStyles: {
           0: { cellWidth: 12, halign: 'center' },
