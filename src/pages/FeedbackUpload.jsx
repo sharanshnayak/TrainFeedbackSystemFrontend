@@ -163,9 +163,10 @@ export default function FeedbackUpload() {
             <ul className="text-red-700 text-sm space-y-1">
               {errors.map((error, idx) => (
                 <li key={idx}>
-                  {error.message || 
+                  {error.message ? 
+                    error.message :
                     (error.errors?.length > 0 
-                      ? `Feedback #${error.feedbackNo}: ${error.errors.join(', ')}` 
+                      ? `Feedback #${error.feedbackNo}: ${error.errors.join(', ')}`
                       : JSON.stringify(error))}
                 </li>
               ))}
