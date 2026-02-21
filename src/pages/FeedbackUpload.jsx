@@ -11,6 +11,7 @@ export default function FeedbackUpload() {
   const [submitted, setSubmitted] = useState(false);
   const [sheetData, setSheetData] = useState([]);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -85,6 +86,12 @@ export default function FeedbackUpload() {
       return;
     }
 
+    // Show confirmation modal
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    setShowConfirmation(false);
     setSubmitting(true);
     setErrors([]);
 
@@ -110,6 +117,10 @@ export default function FeedbackUpload() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleCancelConfirm = () => {
+    setShowConfirmation(false);
   };
 
   const handleDownloadPDF = async () => {
@@ -348,11 +359,41 @@ export default function FeedbackUpload() {
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={submitting}
+                disabled={submitting || errors.length > 0}
+                title={errors.length > 0 ? 'Fix errors before submitting' : ''}
                 className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition text-lg font-semibold"
               >
                 {submitting ? 'Submitting...' : 'Submit All Feedbacks'}
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Confirmation Modal */}
+        {showConfirmation && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-lg">
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Confirm Submission</h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to submit all {uploadedFeedbacks.length} feedbacks? 
+                Please review all information before confirming.
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={handleConfirmSubmit}
+                  disabled={submitting}
+                  className="flex-1 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition font-semibold"
+                >
+                  {submitting ? 'Submitting...' : 'Yes, Submit'}
+                </button>
+                <button
+                  onClick={handleCancelConfirm}
+                  disabled={submitting}
+                  className="flex-1 bg-gray-400 text-white px-4 py-3 rounded-lg hover:bg-gray-500 disabled:bg-gray-300 disabled:cursor-not-allowed transition font-semibold"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         )}
