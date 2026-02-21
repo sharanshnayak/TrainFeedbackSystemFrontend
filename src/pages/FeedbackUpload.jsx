@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import api from '../services/api';
-import Layout from '../components/Layout';
 
 export default function FeedbackUpload() {
   const [file, setFile] = useState(null);
@@ -103,8 +102,7 @@ export default function FeedbackUpload() {
   };
 
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Upload Feedbacks</h1>
           <p className="text-gray-600">Upload your feedback report (XLSX file) to import feedbacks</p>
@@ -299,6 +297,6 @@ export default function FeedbackUpload() {
           </div>
         )}
       </div>
-    </Layout>
-  );
-}
+    );
+  }
+
