@@ -152,7 +152,7 @@ export const generateConsolidatedPDF = (sheetData) => {
 
     // Generate filename with first sheet train info
     const firstSheet = sheetData[0];
-    const fileName = `feedbacks_${firstSheet.trainNo}_${new Date(firstSheet.reportDate).toISOString().split('T')[0]}.pdf`;
+    const fileName = `feedbacks_${firstSheet.trainNo}_${firstSheet.reportDate}.pdf`;
     doc.save(fileName);
 
     return { success: true, message: 'PDF generated successfully' };
